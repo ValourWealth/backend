@@ -133,8 +133,6 @@ SIMPLE_JWT = {
 }
 
 
-# MUX_TOKEN_ID = "6a00ac2c-d30a-4304-abbe-fd98e28544ed"
-# MUX_TOKEN_SECRET = "rb7Xq+k+x+/QTh+Tm90o126rfGVBYLtAJdUD4AAePqse+JQPyOMzxZAvYZoe37VRH4aoa66sA+5"
 
 MUX_TOKEN_ID = "96794e68-9334-404b-b2aa-94bda6f75506"
 MUX_TOKEN_SECRET = "wGuZPStY+p3XZV3aA3+tR9zEXQsqXT+/njuMVeTxzHCRT9AsRwj9jobhgdGZvTUoQZgwpRdZvBL"
@@ -142,13 +140,6 @@ MUX_TOKEN_SECRET = "wGuZPStY+p3XZV3aA3+tR9zEXQsqXT+/njuMVeTxzHCRT9AsRwj9jobhgdGZ
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# this is for local running app database in our case we need to shift our data in to cloud
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 DATABASES = {
     'default': dj_database_url.config(
         default=config('DATABASE_URL'),
