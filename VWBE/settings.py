@@ -33,8 +33,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "*",
-    "valourwealthdjango-production.up.railway.app",
-    "https://frontend-eight-rho-95.vercel.app", 
+    "https://backend-production-1e63.up.railway.app",
+    "https://valourwealth-frontend-psi.vercel.app"
 ]
 
 # This is for cloudflare video storage configurations:
@@ -167,9 +167,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost",
     "http://127.0.0.1:8000",
     "https://192.168.1.12:3000",
-    "https://valourwealthdjango-production.up.railway.app",
-    "https://valourwealthy.vercel.app",
-    "https://frontend-eight-rho-95.vercel.app",
+    "https://backend-production-1e63.up.railway.app",
+    "https://valourwealth-frontend-psi.vercel.app",
 ]
 
 
@@ -187,12 +186,6 @@ EMAIL_HOST_PASSWORD = 'rbug tyhd vtra xrtk'
 
 
 
-
-# # Load environment variables from .env file
-# load_dotenv()
-
-# # Access EXA API key
-# EXA_API_KEY = os.getenv("EXA_API_KEY") 
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
