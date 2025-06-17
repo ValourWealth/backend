@@ -8,6 +8,35 @@ from .models import TradeJournalEntry
 User = get_user_model()
 
 
+# class UserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = [
+#             "id",
+#             "username",
+#             "email",
+#             "first_name",
+#             "last_name",
+#             "created_at",
+#             "password"
+#         ]
+#         extra_kwargs = {
+#             'password': {'write_only': True}
+#         }
+
+    
+#      def create(self, validated_data):
+#     # Save password as plain text — WARNING: Not secure!
+#         password = validated_data.pop('password', None)
+#         user = User(**validated_data)
+#         if password is not None:
+#             user.password = password  # Save plain password
+#         user.save()
+#         return user
+#     # def create(self, validated_data):
+#     #     user = User.objects.create_user(**validated_data)
+#     #     return user
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -25,8 +54,14 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
+        # Save password as plain text — WARNING: Not secure!
+        password = validated_data.pop('password', None)
+        user = User(**validated_data)
+        if password is not None:
+            user.password = password  # Save plain password
+        user.save()
         return user
+
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -75,8 +110,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
             user.first_name = user_data['first_name']
         if 'last_name' in user_data:
             user.last_name = user_data['last_name']
+        # if 'password' in validated_data:
+        #     user.set_password(validated_data['password'])
         if 'password' in validated_data:
-            user.set_password(validated_data['password'])
+            user.password = validated_data['password']  # Save plain password
 
         user.save()
         return super().update(instance, validated_data)
