@@ -50,67 +50,68 @@ from .views import (
 from .views import UserProfileDetailView
 
 from rest_framework.routers import DefaultRouter
-from main.views import  (CourseViewSet, CourseLevelViewSet, VideoViewSet, mark_video_watched, get_course_progress, NoteViewSet, NotesByLevelAPIView,
-                         MCQQuestionListAPIView, SubmitQuizAPIView,UserProfileDetailView, all_courses_progress,
-                         WebinarListCreateView, WebinarRetrieveUpdateDestroyView, register_for_webinar, unregister_from_webinar,
-                            MyConversationsView, SendMessageView, TradeJournalListCreateView,
-                            user_list, FeatureRequestViewSet,
+from main.views import  *
+# (CourseViewSet, CourseLevelViewSet, VideoViewSet, mark_video_watched, get_course_progress, NoteViewSet, NotesByLevelAPIView,
+#                          MCQQuestionListAPIView, SubmitQuizAPIView,UserProfileDetailView, all_courses_progress,
+#                          WebinarListCreateView, WebinarRetrieveUpdateDestroyView, register_for_webinar, unregister_from_webinar,
+#                             MyConversationsView, SendMessageView, TradeJournalListCreateView,
+#                             user_list, FeatureRequestViewSet,
 
-                            ChallengeViewSet, ChallengeParticipantViewSet,
+#                             ChallengeViewSet, ChallengeParticipantViewSet,
 
-                            # ChallengeListView,
-                            # JoinChallengeView,
-                            # UpdatePerformanceView,
-                            # ChallengeLeaderboardView,
-                            # MyChallengePerformanceView,
-                            # OverallLeaderboardView,
-                            NotificationListView,
-                            MarkNotificationAsReadView,
-                            unread_counts,
-                            challenge_leaderboard,
-                            # BeginnerHubCourseListView,
-                            # BeginnerHubSectionListView,
-                            # BeginnerHubVideoListView,
-                            # save_beginnerhub_progress,
-                            # get_beginnerhub_progress,
-                            TradeGPTTokenView,
-                            SalesContactView,
-                            TrainingContactView,
-                            weekly_large_caps_up_view, weekly_large_caps_down_view,
-    weekly_medium_caps_up_view, weekly_medium_caps_down_view,
-    weekly_small_caps_up_view, weekly_small_caps_down_view,
-      intraday_large_caps_up_view,
-    intraday_large_caps_down_view,
-    intraday_medium_caps_up_view,
-    intraday_medium_caps_down_view,
-    intraday_small_caps_up_view,
-    intraday_small_caps_down_view,
+#                             # ChallengeListView,
+#                             # JoinChallengeView,
+#                             # UpdatePerformanceView,
+#                             # ChallengeLeaderboardView,
+#                             # MyChallengePerformanceView,
+#                             # OverallLeaderboardView,
+#                             NotificationListView,
+#                             MarkNotificationAsReadView,
+#                             unread_counts,
+#                             challenge_leaderboard,
+#                             # BeginnerHubCourseListView,
+#                             # BeginnerHubSectionListView,
+#                             # BeginnerHubVideoListView,
+#                             # save_beginnerhub_progress,
+#                             # get_beginnerhub_progress,
+#                             TradeGPTTokenView,
+#                             SalesContactView,
+#                             TrainingContactView,
+#                             weekly_large_caps_up_view, weekly_large_caps_down_view,
+#     weekly_medium_caps_up_view, weekly_medium_caps_down_view,
+#     weekly_small_caps_up_view, weekly_small_caps_down_view,
+#       intraday_large_caps_up_view,
+#     intraday_large_caps_down_view,
+#     intraday_medium_caps_up_view,
+#     intraday_medium_caps_down_view,
+#     intraday_small_caps_up_view,
+#     intraday_small_caps_down_view,
   
-    MarketNewsAPIView,
-    PlatinumBriefingListAPIView,
-    CoursesByCategory, CourseVideosView, VideoDetailView,
-    create_mux_stream,
-    MT5SnapshotUploadView,
-    PortfolioSummaryView,
-    SectorExposureView,
-    AISuggestionsView,
-    start_analyst_chat,
-    AnalystChatDetailView,
-    AnalystMessageCreateView,
-    assigned_analyst,
-    subscribe_newsletter,
-    footer_subscribe,
-    leave_review,
-    request_call_credits,
-    SectorIQView,
-    DiversificationScoreView,
-    EditorsChoiceListView,
-    ensure_analyst_chat,
+#     MarketNewsAPIView,
+#     PlatinumBriefingListAPIView,
+#     CoursesByCategory, CourseVideosView, VideoDetailView,
+#     create_mux_stream,
+#     MT5SnapshotUploadView,
+#     PortfolioSummaryView,
+#     SectorExposureView,
+#     AISuggestionsView,
+#     start_analyst_chat,
+#     AnalystChatDetailView,
+#     AnalystMessageCreateView,
+#     assigned_analyst,
+#     subscribe_newsletter,
+#     footer_subscribe,
+#     leave_review,
+#     request_call_credits,
+#     SectorIQView,
+#     DiversificationScoreView,
+#     EditorsChoiceListView,
+#     ensure_analyst_chat,
     
 
                             
 
-)
+# )
 
 
 
@@ -148,6 +149,9 @@ urlpatterns = [
 
     # user endpoints
     path('api/user/profile/', UserProfileDetailView.as_view(), name='user-profile-detail'),
+    # impersonate user login
+    path('api/admin/impersonate/', ImpersonateUserView.as_view(), name='impersonate-user'),
+
     path("api/generate-tradegpt-token/", TradeGPTTokenView.as_view(), name="generate-tradegpt-token"),
     
     # for platinum member user list all user:
@@ -180,20 +184,12 @@ urlpatterns = [
     path('api/chat/my-conversations/', MyConversationsView.as_view()),
     path('api/chat/send/', SendMessageView.as_view()),
     
-    # ✅ New clean analyst chat endpoints
+    
     path("api/analyst-chat/start/", start_analyst_chat),
     path("api/analyst-chat/", AnalystChatDetailView.as_view()),
     path("api/analyst-chat/send/", AnalystMessageCreateView.as_view()),
     path("api/assigned-analyst/", assigned_analyst, name="assigned_analyst"),
     path("api/analyst-chat/ensure/", ensure_analyst_chat),
-    # path('api/analyst-chat/inbox/', analyst_inbox),
-
-
-
-    # path("api/chat/start/", start_chat_with_analyst, name="start_chat_with_analyst"),
-    # path("api/assigned-analyst/", assigned_analyst),
-    # path('api/chat/analyst-conversations/', MyConversationsViewForAnalyst.as_view()),
-
 
     # for session call
     path('api/', include(routersch.urls)),
@@ -203,13 +199,6 @@ urlpatterns = [
     # Challenge Routes
     path('api/', include(challengerouter.urls)),
     path('api/challenges/<int:pk>/leaderboard/', challenge_leaderboard),
-
-    # path('api/challenges/', ChallengeListView.as_view(), name='challenge-list'),
-    # path('api/challenges/<int:pk>/join/', JoinChallengeView.as_view(), name='join-challenge'),
-    # path('api/challenges/<int:pk>/update-performance/', UpdatePerformanceView.as_view(), name='update-performance'),
-    # path('api/challenges/<int:pk>/leaderboard/', ChallengeLeaderboardView.as_view(), name='challenge-leaderboard'),
-    # path('api/challenges/<int:pk>/my-performance/', MyChallengePerformanceView.as_view(), name='my-challenge-performance'),
-    # path('api/leaderboard/overall/', OverallLeaderboardView.as_view(), name='overall-leaderboard'),
 
     #For notification platinum member
     path('api/notifications/', NotificationListView.as_view(), name='notifications'),
@@ -236,37 +225,7 @@ urlpatterns = [
 
   # landing page blog
    path('api/editors-choice/', EditorsChoiceListView.as_view(), name='editors-choice'),
-    # path("api/beginnerhub/courses/", BeginnerHubCourseListView.as_view()),
-    # path("api/beginnerhub/courses/<int:course_id>/sections/", BeginnerHubSectionListView.as_view()),
-    # path("api/beginnerhub/courses/<int:course_id>/sections/<str:level>/videos/", BeginnerHubVideoListView.as_view()),
-    # path("api/beginnerhub/progress/", save_beginnerhub_progress),
-    # path("api/beginnerhub/progress/<int:video_id>/", get_beginnerhub_progress),
-
-    # path('api/courses/<int:course_id>/videos/', CourseVideosAPIView.as_view(), name='course-videos'),
-    # # Course endpoints
-    # path('api/courses/', CourseListAPIView.as_view(), name='course-list'),
-    # path('api/courses/<int:course_id>/enroll/', EnrollCourseAPIView.as_view(), name='course-enroll'),
-    # path('api/courses/<int:id>/', CourseDetailAPIView.as_view(), name='course-detail'),
-    # path('api/courses/<int:course_id>/levels/', CourseLevelsAPIView.as_view(), name='course-levels'),
-
-    # # Video endpoints
-    # path('api/levels/<int:level_id>/videos/', LevelVideosAPIView.as_view(), name='level-videos'),
-    # path('api/videos/<int:video_id>/', VideoDetailAPIView.as_view(), name='video-detail'),
-    # path('api/videos/<int:video_id>/complete/', CompleteVideoAPIView.as_view(), name='video-complete'),
-
-    # # Quiz endpoints
-    # path('api/quizzes/<int:quiz_id>/', QuizDetailAPIView.as_view(), name='quiz-detail'),
-    # path('api/quizzes/<int:quiz_id>/submit/', SubmitQuizAPIView.as_view(), name='quiz-submit'),
-
-    # # Exam endpoints
-    # path('api/levels/<int:level_id>/exam/', LevelExamDetailAPIView.as_view(), name='exam-detail'),
-    # path('api/levels/<int:level_id>/exam/submit/', SubmitExamAPIView.as_view(), name='exam-submit'),
-
-
-
-    # # updations:
-    # path('api/levels/<int:level_id>/progress/', LevelProgressAPIView.as_view(), name='level-progress'),
-
+   
     # for smtp -contact us
     path('api/request-demo/', request_demo, name='request_demo'),
     path('api/contact-us/', contact_us, name='contact-us'),

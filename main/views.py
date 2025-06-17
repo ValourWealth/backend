@@ -60,6 +60,32 @@ class UserProfileDetailView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# Impersonate user login view for login any user account:
+from django.contrib.auth import get_user_model
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
+User = get_user_model()
+
+class ImpersonateUserView(APIView):
+    permission_classes = [IsAdminUser]  # only for superusers/admins
+
+    def post(self, request, *args, **kwargs):
+        username = request.data.get("username")
+        try:
+            user = User.objects.get(username=username)
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "impersonated_user": username,
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+            })
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)
+
+
 
 # this is for Trade gpt 
 import jwt
