@@ -47,35 +47,6 @@ SUBSCRIPTION_CHOICES = [
     ('platinum', 'Platinum'),
 ]
 
-# class UserProfiles(models.Model):
-#     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
-#     bio = models.TextField(blank=True, null=True)
-#     phone_number = models.CharField(max_length=20, blank=True, null=True)
-#     # profile_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
-#     profile_photo = models.ImageField(
-#         upload_to='profile_photos/',
-#         storage=R2Storage(),  # upload to R2
-#         blank=True,
-#         null=True
-#     )
-    
-#     subscription_status = models.CharField(max_length=20, choices=SUBSCRIPTION_CHOICES, default='free')
-    
-    
-#     country = CountryField(blank=True, null=True)
-#     state = models.CharField(max_length=100, blank=True, null=True)  # Optional: dynamic on frontend
-
-#     updated_at = models.DateTimeField(auto_now=True)
-
-#     def __str__(self):
-#         return f"{self.user.username}'s Profile"
-    
-#     @property
-#     def profile_photo_public_url(self):
-#         if self.profile_photo:
-#             return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{self.profile_photo.name}"
-#         return None
-
 
 class UserProfiles(models.Model):
     USER_ROLES = [
@@ -105,7 +76,8 @@ class UserProfiles(models.Model):
     @property
     def profile_photo_public_url(self):
         if self.profile_photo:
-            return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{self.profile_photo.name}"
+            # return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{self.profile_photo.name}"
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{self.profile_photo.name}"
 
 
 
@@ -145,24 +117,6 @@ class CourseLevel(models.Model):
         return f"{self.course.title} - {self.level}"
 
 
-
-# /////////////////////////////////////////////////////////////////////////////////////////////////////////
-# this code is for only uploading videos to r2 storage from django admin panel
-# class Video(models.Model):
-#     course_level = models.ForeignKey(CourseLevel, on_delete=models.CASCADE, related_name='videos')
-#     title = models.CharField(max_length=255)
-#     description = models.TextField()
-#     video_file = models.FileField(storage=R2Storage(), upload_to='course_videos/', null=True, blank=True  )
-#     uploaded_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"{self.title} - {self.course_level.level}"
-
-#     @property
-#     def public_url(self):
-#         return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{self.video_file.name}"
-
-# /////////////////////////////////////////////////////////////////////////////////////////////////////////
 class Video(models.Model):
     course_level = models.ForeignKey(CourseLevel, on_delete=models.CASCADE, related_name='videos')
     title = models.CharField(max_length=255)
@@ -186,22 +140,12 @@ class Video(models.Model):
             file_name = self.video_file.name.strip()
             if file_name.startswith("http://") or file_name.startswith("https://"):
                 return file_name
-            return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{file_name}"
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{file_name}"
         elif self.manual_video_url:
             return self.manual_video_url
         return None
     
     
-    # @property
-    # def public_url(self):
-    #     if self.video_file and self.video_file.name:
-    #         return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{self.video_file.name}"
-    #     elif self.manual_video_url:
-    #         return self.manual_video_url
-    #     return None
-
-
-
 # for video progress 
 class VideoProgress(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -338,7 +282,7 @@ class Webinar(models.Model):
     @property
     def thumbnail_public_url(self):
         if self.thumbnail:
-            return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{self.thumbnail.name}"
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{self.thumbnail.name}"
         return None
 
     def registered_count(self):
@@ -542,11 +486,8 @@ class ChallengeParticipant(models.Model):
     @property
     def screenshot_public_url(self):
         if self.screenshots:
-            return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{self.screenshots.name}"
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{self.screenshots.name}"
         return None
-
-
-# =========================================================================================================
 
 # Landing page Blogs
 from django.db import models
@@ -578,8 +519,7 @@ class EditorsChoice(models.Model):
 
     @property
     def image_url(self):
-        return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{self.image.name}"
-
+        return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{self.image.name}"
     def __str__(self):
         return self.title
 
@@ -626,7 +566,7 @@ class WeeklyBriefing(models.Model):
     @property
     def thumbnail_public_url(self):
         if self.thumbnail:
-            return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{self.thumbnail.name}"
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{self.thumbnail.name}"
         return None
     
     
@@ -717,8 +657,8 @@ class BeginnerHubVideo(models.Model):
     @property
     def video_url(self):
         if self.video_file and getattr(self.video_file, 'name', '').strip():
-            name = self.video_file.name.replace("bucket1/", "")
-            return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{name}"
+            name = self.video_file.name.replace("valourswealth/", "")
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{name}"
         elif self.manual_video_url:
             return self.manual_video_url
         return None
@@ -726,8 +666,8 @@ class BeginnerHubVideo(models.Model):
     @property
     def thumbnail_url(self):
         if self.thumbnail_file and getattr(self.thumbnail_file, 'name', '').strip():
-            name = self.thumbnail_file.name.replace("bucket1/", "")
-            return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{name}"
+            name = self.thumbnail_file.name.replace("valourswealth/", "")
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{name}"
         elif self.manual_thumbnail_url:
             return self.manual_thumbnail_url
         return None
@@ -754,19 +694,6 @@ class SalesInquiry(models.Model):
 
 
 # ======================================================================= Meta Trader 5 for platinum portfolio
-# from django.db import models
-
-# class MT5Snapshot(models.Model):
-#     timestamp = models.DateTimeField(auto_now_add=True)
-#     account_login = models.CharField(max_length=50)
-#     balance = models.FloatField()
-#     equity = models.FloatField()
-#     margin = models.FloatField()
-#     leverage = models.IntegerField()
-#     portfolio_value = models.FloatField(default=0)  #  NEW
-#     open_positions = models.JSONField()
-#     recent_trades = models.JSONField()
-
 from django.conf import settings
 from django.db import models
 

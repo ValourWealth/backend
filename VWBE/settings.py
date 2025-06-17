@@ -46,9 +46,9 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 AWS_ACCESS_KEY_ID = '5a236ae1537509899ed73f6145a745ca'
 AWS_SECRET_ACCESS_KEY = '511883817eef2106333fe774788ad9d5ff8fd2cd01e167b9ddb70dea5335d3eb'
-AWS_STORAGE_BUCKET_NAME = 'bucket1'
+AWS_STORAGE_BUCKET_NAME = 'valourswealth'
 
-AWS_S3_ENDPOINT_URL = 'https://a5f9ee7b3883a9c77c46adca93821bec.r2.cloudflarestorage.com'
+AWS_S3_ENDPOINT_URL = 'https://67216f1510b2341aed5462099561b745.r2.cloudflarestorage.com'
 AWS_S3_REGION_NAME = 'auto'  # R2 doesn't use real AWS regions
 
 AWS_S3_FILE_OVERWRITE = False

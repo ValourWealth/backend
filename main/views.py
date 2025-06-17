@@ -187,31 +187,6 @@ from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-# class MyConversationsView(generics.ListAPIView):
-#     serializer_class = ConversationSerializer
-
-#     def get_queryset(self):
-#         return Conversation.objects.filter(participants=self.request.user)
-
-# class MyConversationsView(generics.ListAPIView):
-#     serializer_class = ConversationSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def get_queryset(self):
-#         user = self.request.user
-
-#         # Ensure the user is part of the group chat (ID=1)
-#         try:
-#             global_convo = Conversation.objects.get(id=1)
-#         except Conversation.DoesNotExist:
-#             global_convo = Conversation.objects.create(id=1)
-        
-#         if user not in global_convo.participants.all():
-#             global_convo.participants.add(user)
-
-#         # Return all conversations the user is a participant in
-#         return Conversation.objects.filter(participants=user)
 # this is for the group chat 
 class MyConversationsView(generics.ListAPIView):
     serializer_class = ConversationSerializer
@@ -258,22 +233,6 @@ from .models import UserProfiles
 
 User = get_user_model()
 
-# @api_view(['POST'])
-# @permission_classes([permissions.IsAuthenticated])
-# def start_analyst_chat(request):
-#     user = request.user
-
-#     if not hasattr(user, 'profile') or user.profile.subscription_status != 'platinum':
-#         return Response({"error": "Only platinum members can chat with analysts."}, status=403)
-
-#     analyst_profile = UserProfiles.objects.filter(role='analyst').first()
-#     if not analyst_profile:
-#         return Response({"error": "No analyst found."}, status=404)
-
-#     chat, created = AnalystChat.objects.get_or_create(user=user, analyst=analyst_profile.user)
-#     serializer = AnalystChatSerializer(chat)
-#     return Response(serializer.data)
-
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def start_analyst_chat(request):
@@ -290,13 +249,6 @@ def start_analyst_chat(request):
     serializer = AnalystChatSerializer(chat)
     return Response(serializer.data)
 
-
-# class AnalystChatDetailView(generics.RetrieveAPIView):
-#     permission_classes = [permissions.IsAuthenticated]
-#     serializer_class = AnalystChatSerializer
-
-#     def get_object(self):
-#         return AnalystChat.objects.filter(user=self.request.user).first()
 class AnalystChatDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AnalystChatSerializer
@@ -323,19 +275,6 @@ from .serializers import AnalystChatSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
-# class AnalystMessageCreateView(APIView):
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def post(self, request):
-#         data = request.data.copy()
-
-#         serializer = AnalystMessageSerializer(data=data)
-#         if serializer.is_valid():
-#             serializer.save(sender=request.user)  # ✅ HERE: set sender manually
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class AnalystMessageCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -379,23 +318,6 @@ def assigned_analyst(request):
         "profile_photo_url": analyst_profile.profile_photo_public_url
     })
 
-
-# if there is no conversation available immediatley will be create
-# @api_view(['GET'])
-# @permission_classes([permissions.IsAuthenticated])
-# def ensure_analyst_chat(request):
-#     user = request.user
-
-#     if not hasattr(user, 'profile') or user.profile.subscription_status != 'platinum':
-#         return Response({"error": "Only platinum members can chat with analysts."}, status=403)
-
-#     analyst_profile = UserProfiles.objects.filter(role='analyst').first()
-#     if not analyst_profile:
-#         return Response({"error": "No analyst found."}, status=404)
-
-#     chat, created = AnalystChat.objects.get_or_create(user=user, analyst=analyst_profile.user)
-#     serializer = AnalystChatSerializer(chat)
-#     return Response(serializer.data)
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
@@ -687,40 +609,6 @@ class IsPlatinumUser(permissions.BasePermission):
 # ======================================================================================================================================================
 
 
-# class ChallengeParticipantViewSet(viewsets.ModelViewSet):
-#     queryset = ChallengeParticipant.objects.all()
-#     serializer_class = ChallengeParticipantSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def get_queryset(self):
-#         return ChallengeParticipant.objects.filter(user=self.request.user)
-
-#     @action(detail=True, methods=['post'])
-#     def submit_response(self, request, pk=None):
-#         challenge_participant = self.get_object()
-
-#         # Check if user has already submitted
-#         if challenge_participant.status == "Completed":
-#             return Response({"detail": "You have already completed this challenge."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         # Update the participant with their answers and screenshot
-#         challenge_participant.answers = request.data.get("answers")
-#         if 'screenshots' in request.FILES:
-#             challenge_participant.screenshots = request.FILES['screenshots']
-#         challenge_participant.status = "Completed"
-#         challenge_participant.save()
-
-#         return Response({"detail": "Your response has been submitted successfully."}, status=status.HTTP_200_OK)
-
-#     @action(detail=False, methods=['get'])
-#     def leaderboard(self, request):
-#         challenge_id = request.query_params.get('challenge_id')
-#         if challenge_id:
-#             challenge = Challenge.objects.get(id=challenge_id)
-#             participants = ChallengeParticipant.objects.filter(challenge=challenge).order_by('-leaderboard_position')
-#             serializer = ChallengeParticipantSerializer(participants, many=True)
-#             return Response(serializer.data)
-#         return Response({"detail": "Challenge ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -806,13 +694,7 @@ def challenge_leaderboard(request, pk):
 
 
 
-
-# ======================================================================================================================================================
-# ======================================================================================================================================================
-
-
-
-#//********************************************************************************************************************************************************************************
+# ********************************************************************************************************************************************************************************
 
 from rest_framework import generics, permissions
 from .models import Notification
@@ -851,10 +733,6 @@ def unread_counts(request):
     })
 
 
-
-
-# ********************************************************************************************************************************************************************************
-# ********************************************************************************************************************************************************************************
 
 
 
@@ -1005,42 +883,6 @@ def mark_video_watched(request, video_id):
     obj.watched = True
     obj.save()
     return Response({'message': 'Marked as watched'})
-
-
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# def get_course_progress(request, course_id):
-#     course = get_object_or_404(Course, id=course_id)
-#     levels = course.levels.all()
-#     total_videos = 0
-#     watched_videos = 0
-
-#     level_progress = []
-
-#     for level in levels:
-#         videos = level.videos.all()
-#         total = videos.count()
-#         watched = VideoProgress.objects.filter(user=request.user, video__in=videos, watched=True).count()
-#         total_videos += total
-#         watched_videos += watched
-
-#         level_progress.append({
-#             'level': level.level,
-#             'watched': watched,
-#             'total': total,
-#             'percent': int((watched / total) * 100) if total > 0 else 0,
-#         })
-
-#     total_percent = int((watched_videos / total_videos) * 100) if total_videos > 0 else 0
-#     passed_levels = LevelProgress.objects.filter(user=request.user, passed_quiz=True).values_list('course_level__level', flat=True)
-
-#     return Response({
-#         'levels': level_progress,
-#         'total_progress': total_percent,
-#         'total_videos': total_videos,
-#         'watched_videos': watched_videos,
-#         'passed_levels': list(passed_levels),  #  This line was missing
-#     })
 
 from .models import LevelProgress
 
@@ -1344,321 +1186,6 @@ def contact_us(request):
 # ================================================================================ For Scrapers api's ==================================================================
 # ====================================================================================================================================================================================== 
 import openpyxl 
- 
- 
-# def read_vertical_data_in_chunks(filepath, chunk_size=8): 
-#    wb = openpyxl.load_workbook(filepath, data_only=True) 
-#    sheet = wb.active  # or wb['SheetName']
-#    rows = list(sheet.iter_rows(values_only=True))
-#     # rows is a list of tuples, one tuple per row, e.g. ("DRI", None, None,  None) 
- 
-#    chunked_data = [] 
-#    for i in range(0, len(rows), chunk_size): 
-#        # Grab up to 8 rows 
-#        subset = rows[i: i + chunk_size] 
- 
-#        # For each row, pick the first cell (index 0). 
-#        # e.g. row (["DRI", None, None]) -> "DRI" 
-#        # This will create one single row of length 8 
-#        flattened_row = [r[0] for r in subset] 
- 
-#        chunked_data.append(flattened_row) 
- 
-#    return chunked_data
-
-
-
-
-# from django.http import JsonResponse 
-# import os 
-# from django.conf import settings 
-# import requests
-# from openpyxl import load_workbook
-# from io import BytesIO
-# from django.http import JsonResponse
-
-# # helper function
-# def fetch_excel_from_url(url):
-#     response = requests.get(url)
-#     if response.status_code == 200:
-#         wb = load_workbook(filename=BytesIO(response.content))
-#         return wb
-#     return None
-
-# # example chunking function (you may already have your own)
-# def read_vertical_data_in_chunks(workbook, chunk_size=8):
-#     sheet = workbook.active
-#     data = []
-
-#     for col in sheet.iter_cols(values_only=True):
-#         chunk = [cell for cell in col if cell is not None]
-#         for i in range(0, len(chunk), chunk_size):
-#             data.append(chunk[i:i+chunk_size])
-
-#     return data
-
-
-
-# def xlsx_data_view_large_caps(request): 
-#     url = "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump.xlsx"
-#     workbook = fetch_excel_from_url(url)
-
-#     if not workbook:
-#         return JsonResponse({"error": "Failed to load Excel file"}, status=500)
-
-#     chunked_data = read_vertical_data_in_chunks(workbook, chunk_size=8)
-
-#     # Map the chunks into structured dictionaries
-#     result = []
-#     for chunk in chunked_data:
-#         if len(chunk) < 6:
-#             continue
-#         result.append({
-#             "ticker": chunk[0],
-#             "from_price": chunk[1],
-#             "from_time": chunk[2],
-#             "to_price": chunk[3],
-#             "to_time": chunk[4],
-#             "irregular_vol": chunk[5],
-#             "percent_change": chunk[6],
-#             "duration": chunk[7],
-#         })
-
-#     return JsonResponse(result, safe=False)
-
-
-
-
-
-# # def xlsx_data_view_large_caps(request): 
-# #     url = "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump.xlsx"
-# #     workbook = fetch_excel_from_url(url)
-    
-# #     if not workbook:
-# #         return JsonResponse({"error": "Failed to load Excel file"}, status=500)
-    
-# #     chunked_data = read_vertical_data_in_chunks(workbook, chunk_size=8)
-# #     return JsonResponse({"chunked_data": chunked_data})
-
-
-# def xlsx_data_view_medium_caps(request): 
-#     url = "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump_medium.xlsx"
-#     workbook = fetch_excel_from_url(url)
-
-#     if not workbook:
-#         return JsonResponse({"error": "Failed to load Excel file"}, status=500)
-
-#     chunked_data = read_vertical_data_in_chunks(workbook, chunk_size=8)
-#        # Map the chunks into structured dictionaries
-#     result = []
-#     for chunk in chunked_data:
-#         if len(chunk) < 6:
-#             continue
-#         result.append({
-#             "ticker": chunk[0],
-#             "from_price": chunk[1],
-#             "from_time": chunk[2],
-#             "to_price": chunk[3],
-#             "to_time": chunk[4],
-#             "irregular_vol": chunk[5],
-#             "percent_change": chunk[6],
-#             "duration": chunk[7],
-#         })
-
-#     return JsonResponse({"chunked_data": chunked_data})
-
-
-# def xlsx_data_view_small_caps(request): 
-#     url = "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump_small.xlsx"
-#     workbook = fetch_excel_from_url(url)
-
-#     if not workbook:
-#         return JsonResponse({"error": "Failed to load Excel file"}, status=500)
-
-#     chunked_data = read_vertical_data_in_chunks(workbook, chunk_size=8)
-#        # Map the chunks into structured dictionaries
-#     result = []
-#     for chunk in chunked_data:
-#         if len(chunk) < 6:
-#             continue
-#         result.append({
-#             "ticker": chunk[0],
-#             "from_price": chunk[1],
-#             "from_time": chunk[2],
-#             "to_price": chunk[3],
-#             "to_time": chunk[4],
-#             "irregular_vol": chunk[5],
-#             "percent_change": chunk[6],
-#             "duration": chunk[7],
-#         })
-
-#     return JsonResponse({"chunked_data": chunked_data})
-
-
-# # this is for down 
-# def xlsx_data_view_large_caps_down(request): 
-#     url = "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump_down.xlsx"
-#     workbook = fetch_excel_from_url(url)
-    
-#     if not workbook:
-#         return JsonResponse({"error": "Failed to load Excel file"}, status=500)
-    
-#     chunked_data = read_vertical_data_in_chunks(workbook, chunk_size=8)
-#        # Map the chunks into structured dictionaries
-#     result = []
-#     for chunk in chunked_data:
-#         if len(chunk) < 6:
-#             continue
-#         result.append({
-#             "ticker": chunk[0],
-#             "from_price": chunk[1],
-#             "from_time": chunk[2],
-#             "to_price": chunk[3],
-#             "to_time": chunk[4],
-#             "irregular_vol": chunk[5],
-#             "percent_change": chunk[6],
-#             "duration": chunk[7],
-#         })
-
-#     return JsonResponse({"chunked_data": chunked_data})
-
-
-# def xlsx_data_view_medium_caps_down(request): 
-#     url = "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump_medium_down.xlsx"
-#     workbook = fetch_excel_from_url(url)
-
-#     if not workbook:
-#         return JsonResponse({"error": "Failed to load Excel file"}, status=500)
-
-#     chunked_data = read_vertical_data_in_chunks(workbook, chunk_size=8)
-#        # Map the chunks into structured dictionaries
-#     result = []
-#     for chunk in chunked_data:
-#         if len(chunk) < 6:
-#             continue
-#         result.append({
-#             "ticker": chunk[0],
-#             "from_price": chunk[1],
-#             "from_time": chunk[2],
-#             "to_price": chunk[3],
-#             "to_time": chunk[4],
-#             "irregular_vol": chunk[5],
-#             "percent_change": chunk[6],
-#             "duration": chunk[7],
-#         })
-
-#     return JsonResponse({"chunked_data": chunked_data})
-
-
-# def xlsx_data_view_small_caps_down(request): 
-#     url = "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump_small_down.xlsx"
-#     workbook = fetch_excel_from_url(url)
-
-#     if not workbook:
-#         return JsonResponse({"error": "Failed to load Excel file"}, status=500)
-
-#     chunked_data = read_vertical_data_in_chunks(workbook, chunk_size=8)
-#        # Map the chunks into structured dictionaries
-#     result = []
-#     for chunk in chunked_data:
-#         if len(chunk) < 6:
-#             continue
-#         result.append({
-#             "ticker": chunk[0],
-#             "from_price": chunk[1],
-#             "from_time": chunk[2],
-#             "to_price": chunk[3],
-#             "to_time": chunk[4],
-#             "irregular_vol": chunk[5],
-#             "percent_change": chunk[6],
-#             "duration": chunk[7],
-#         })
-
-#     return JsonResponse({"chunked_data": chunked_data})
-
-
-
-
-# ===================================================================================================================================
-
-# from django.http import JsonResponse
-# import requests
-# from openpyxl import load_workbook
-# from io import BytesIO
-
-
-# def fetch_excel_from_url(url):
-#     response = requests.get(url)
-#     if response.status_code == 200:
-#         wb = load_workbook(filename=BytesIO(response.content), data_only=True)
-#         return wb
-#     return None
-
-
-# def read_vertical_data_in_chunks(workbook, chunk_size=8):
-#     sheet = workbook.active
-#     data = []
-#     for col in sheet.iter_cols(values_only=True):
-#         chunk = [cell for cell in col if cell is not None]
-#         for i in range(0, len(chunk), chunk_size):
-#             data.append(chunk[i:i + chunk_size])
-#     return data
-
-
-# def format_chunk_to_dict(chunk):
-#     keys = [
-#         "ticker",
-#         "from_price",
-#         "from_time",
-#         "to_price",
-#         "to_time",
-#         "irregular_vol",
-#         "percent_change",
-#         "duration",
-#     ]
-#     return dict(zip(keys, chunk + [None] * (len(keys) - len(chunk))))
-
-
-# def generate_excel_view(excel_url):
-#     def view(request):
-#         workbook = fetch_excel_from_url(excel_url)
-#         if not workbook:
-#             return JsonResponse({"error": "Failed to load Excel file"}, status=500)
-
-#         chunked_data = read_vertical_data_in_chunks(workbook, chunk_size=8)
-#         result = [format_chunk_to_dict(chunk) for chunk in chunked_data if chunk and len(chunk) >= 1]
-#         return JsonResponse(result, safe=False)
-
-#     return view
-
-# # === VIEWS ===
-# xlsx_data_view_large_caps = generate_excel_view(
-#     "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump.xlsx"
-# )
-
-# xlsx_data_view_medium_caps = generate_excel_view(
-#     "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump_medium.xlsx"
-# )
-
-# xlsx_data_view_small_caps = generate_excel_view(
-#     "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump_small.xlsx"
-# )
-
-# # Downtrend views
-# xlsx_data_view_large_caps_down = generate_excel_view(
-#     "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump_down.xlsx"
-# )
-
-# xlsx_data_view_medium_caps_down = generate_excel_view(
-#     "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump_medium_down.xlsx"
-# )
-
-# xlsx_data_view_small_caps_down = generate_excel_view(
-#     "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/scraperdatadump_small_down.xlsx"
-# )
-
-
-# ================================================================================================
 from django.http import JsonResponse
 from openpyxl import load_workbook
 from io import BytesIO
@@ -1801,11 +1328,7 @@ from io import BytesIO
 import requests
 import time 
 
-# def fetch_excel_from_url(url):
-#     response = requests.get(url)
-#     if response.status_code == 200:
-#         return load_workbook(filename=BytesIO(response.content), data_only=True)
-#     return None
+
 
 def fetch_excel_from_url(url):
     # Add a cache-busting timestamp to force fresh download
@@ -2193,14 +1716,6 @@ from .models import WeeklyBriefing
 from .serializers import WeeklyBriefingSerializer
 from rest_framework.permissions import IsAuthenticated
 
-# class PlatinumBriefingListAPIView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         # Filter only platinum briefings
-#         briefings = WeeklyBriefing.objects.filter(is_platinum_only=True).order_by('-published_date')
-#         serializer = WeeklyBriefingSerializer(briefings, many=True)
-#         return Response(serializer.data)
 
 
 from rest_framework.views import APIView
@@ -2214,15 +1729,6 @@ from rest_framework.response import Response
 from .models import WeeklyBriefing
 from .serializers import WeeklyBriefingSerializer
 from rest_framework.permissions import IsAuthenticated
-
-# class PlatinumBriefingListAPIView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         briefings = WeeklyBriefing.objects.filter(is_platinum_only=True).order_by('-published_date')
-#         serializer = WeeklyBriefingSerializer(briefings, many=True)
-#         return Response(serializer.data)
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -2282,103 +1788,10 @@ def create_mux_stream(request):
         print("❌ Exception:", str(e))
         return Response({"error": "Unexpected error contacting Mux"}, status=500)
 # ======================================================================================================================================================
-
-# =======================================
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-# from rest_framework.permissions import AllowAny
-# from .models import MT5Snapshot
-
-# class MT5SnapshotUploadView(APIView):
-#     permission_classes = [AllowAny]
-
-#     def post(self, request):
-#         data = request.data
-#         MT5Snapshot.objects.create(
-#             account_login=data.get("account_login"),
-#             balance=data.get("balance"),
-#             equity=data.get("equity"),
-#             margin=data.get("margin"),
-#             leverage=data.get("leverage"),
-#             open_positions=data.get("open_positions", []),
-#             recent_trades=data.get("recent_trades", []),
-#         )
-#         return Response({"status": "saved"})
-
-#     def get(self, request):
-#         latest = MT5Snapshot.objects.last()
-#         return Response({
-#             "account": {
-#                 "login": latest.account_login,
-#                 "balance": latest.balance,
-#                 "equity": latest.equity,
-#                 "margin": latest.margin,
-#                 "leverage": latest.leverage
-#             },
-#             "open_positions": latest.open_positions,
-#             "recent_trades": latest.recent_trades,
-#         })
-
-
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import MT5Snapshot
-
-
-# class MT5SnapshotUploadView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     # def post(self, request):
-#     #     data = request.data
-#     #     MT5Snapshot.objects.create(
-#     #         account_login=data.get("account_login"),
-#     #         balance=data.get("balance"),
-#     #         equity=data.get("equity"),
-#     #         margin=data.get("margin"),
-#     #         leverage=data.get("leverage"),
-#     #         portfolio_value=data.get("portfolio_value", 0),  # ✅ NEW
-#     #         open_positions=data.get("open_positions", []),
-#     #         recent_trades=data.get("recent_trades", []),
-#     #     )
-#     #     return Response({"status": "saved"})
-
-#     def post(self, request):
-#         data = request.data
-#         MT5Snapshot.objects.create(
-#             user=request.user,  # ✅ Link the snapshot to the authenticated user
-#             account_login=data.get("account_login"),
-#             balance=data.get("balance"),
-#             equity=data.get("equity"),
-#             margin=data.get("margin"),
-#             leverage=data.get("leverage"),
-#             portfolio_value=data.get("portfolio_value", 0),
-#             open_positions=data.get("open_positions", []),
-#             recent_trades=data.get("recent_trades", []),
-#             free_margin=data.get("free_margin"),
-#             market_watch=data.get("market_watch", [])
-#         )
-#         return Response({"status": "saved"})
-    
-#     def get(self, request):
-#         latest = MT5Snapshot.objects.last()
-#         if not latest:
-#             return Response({"error": "No snapshot found"}, status=404)
-
-#         return Response({
-#             "account": {
-#                 "login": latest.account_login,
-#                 "balance": latest.balance,
-#                 "equity": latest.equity,
-#                 "margin": latest.margin,
-#                 "leverage": latest.leverage,
-#             },
-#             "portfolio_value": latest.portfolio_value,  # ✅ NEW
-#             "open_positions": latest.open_positions,
-#             "recent_trades": latest.recent_trades,
-#         })
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -2506,11 +1919,6 @@ class AISuggestionsView(APIView):
                 f"PnL: ${pos['pnl']} ({pos['pnl_percent']}%)\n"
             )
 
-        # prompt += (
-        #     "\nPlease analyze this portfolio and provide 3 to 4 separate investment suggestions. "
-        #     "Return each suggestion as a numbered point on a new line (e.g., '1. ...\\n2. ...\\n3. ...'). "
-        #     "Keep suggestions short, practical, and focused on risk-aware portfolio improvement."
-        # )
 
         prompt += (
             "\nPlease analyze this portfolio and provide 3 to 4 suggestions. "

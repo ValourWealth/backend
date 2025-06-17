@@ -30,52 +30,6 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import UserProfiles
 
-# class UserProfileAdmin(admin.ModelAdmin):
-#     list_display = (
-#         'user',
-#         'phone_number',
-#         'country',
-#         'state',
-#         'role',  # Add role to the list display
-#         'profile_image_preview',
-#         'profile_image_url',   
-#         'updated_at',
-#     )
-#     readonly_fields = ('profile_image_preview', 'profile_image_url', 'updated_at')  # Make 'updated_at' readonly
-#     search_fields = ('user__username', 'phone_number', 'country', 'state')
-#     autocomplete_fields = ['user']
-
-#     # Making the 'role' field editable in the admin form
-#     list_filter = ['role']  # Add a filter by role
-
-#     def profile_image_preview(self, obj):
-#         if obj.profile_photo:
-#             return format_html(
-#                 '<img src="https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{}" width="60" height="60" style="object-fit:cover;border-radius:50%;" />',
-#                 obj.profile_photo.name
-#             )
-#         return "No Image"
-#     profile_image_preview.short_description = 'Profile Photo'
-
-#     def profile_image_url(self, obj):
-#         if obj.profile_photo:
-#             return format_html(
-#                 '<a href="https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{}" target="_blank">View URL</a>',
-#                 obj.profile_photo.name
-#             )
-#         return "Not uploaded"
-#     profile_image_url.short_description = 'Public URL'
-
-#     # Removing 'updated_at' from fieldsets and making it readonly
-#     fieldsets = (
-#         (None, {
-#             'fields': ('user', 'bio', 'phone_number', 'country', 'state', 'role', 'profile_photo')
-#         }),
-#         ('Advanced options', {
-#             'classes': ('collapse',),
-#             'fields': ('updated_at',)
-#         }),
-#     )
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = (
         'user',
@@ -96,7 +50,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     def profile_image_preview(self, obj):
         if obj.profile_photo:
             return format_html(
-                '<img src="https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{}" width="60" height="60" style="object-fit:cover;border-radius:50%;" />',
+                '<img src="https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{}" width="60" height="60" style="object-fit:cover;border-radius:50%;" />',
                 obj.profile_photo.name
             )
         return "No Image"
@@ -105,7 +59,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     def profile_image_url(self, obj):
         if obj.profile_photo:
             return format_html(
-                '<a href="https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{}" target="_blank">View URL</a>',
+                '<a href="https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{}" target="_blank">View URL</a>',
                 obj.profile_photo.name
             )
         return "Not uploaded"
@@ -133,47 +87,6 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 admin.site.register(UserProfiles, UserProfileAdmin)
 
-# from django.contrib import admin
-# from django.utils.html import format_html
-# from .models import UserProfiles
-
-
-# class UserProfileAdmin(admin.ModelAdmin):
-#     list_display = (
-#         'user',
-#         'phone_number',
-#         'country',
-#         'state',
-#         'profile_image_preview',
-#         'profile_image_url',   
-#         'updated_at',
-#     )
-#     readonly_fields = ('profile_image_preview', 'profile_image_url')
-#     search_fields = ('user__username', 'phone_number', 'country', 'state')
-#     autocomplete_fields = ['user']
-
-#     def profile_image_preview(self, obj):
-#         if obj.profile_photo:
-#             return format_html(
-#                 '<img src="https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{}" width="60" height="60" style="object-fit:cover;border-radius:50%;" />',
-#                 obj.profile_photo.name
-#             )
-#         return "No Image"
-#     profile_image_preview.short_description = 'Profile Photo'
-
-#     def profile_image_url(self, obj):
-#         if obj.profile_photo:
-#             return format_html(
-#                 '<a href="https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{}" target="_blank">View URL</a>',
-#                 obj.profile_photo.name
-#             )
-#         return "Not uploaded"
-#     profile_image_url.short_description = 'Public URL'
-
-
-# admin.site.register(UserProfiles, UserProfileAdmin)
-# =================================================================================================================================================
-
 from django.contrib import admin
 from .models import UserProfiles
 
@@ -191,40 +104,9 @@ class CourseLevelAdmin(admin.ModelAdmin):
     list_display = ['course', 'level']
     list_filter = ['level']
 
-
-# @admin.register(Video)
-# class VideoAdmin(admin.ModelAdmin):
-#     list_display = ['title', 'course_level', 'uploaded_at', 'get_public_url']
-#     search_fields = ['title', 'description']
-
-#     def get_public_url(self, obj):
-#         return obj.public_url  # This uses the @property on your model
-
-#     get_public_url.short_description = 'Public URL'
 from django.contrib import admin
 from .models import Video
-# @admin.register(Video)
-# class VideoAdmin(admin.ModelAdmin):
-#     list_display = ['title', 'course_level', 'uploaded_at', 'get_public_url']
-#     search_fields = ['title']
-    
-#     readonly_fields = ['get_public_url', 'uploaded_at'] 
-
-#     fields = ('title', 'course_level', 'video_file', 'manual_video_url', 'uploaded_at', 'get_public_url')
-
-#     def get_public_url(self, obj):
-#         return obj.public_url
-
-#     get_public_url.short_description = 'Public URL'
-
-# courses/admin.py  (or wherever VideoAdmin lives)
-# =================================================================================================================================================
 from django.utils.html import format_html
-from .models import Video
-from django.contrib import admin
-from django.utils.html import format_html
-from .models import Video
-
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
@@ -321,15 +203,8 @@ class TradeJournalEntryAdmin(admin.ModelAdmin):
 
     
 from .models import Webinar
-
-# @admin.register(Webinar)
-# class WebinarAdmin(admin.ModelAdmin):
-#     list_display = ("title", "presenter", "date", "time", "level", "status")
-#     list_filter = ("status", "level")
-#     search_fields = ("title", "presenter")
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Webinar
 
 @admin.register(Webinar)
 class WebinarAdmin(admin.ModelAdmin):
@@ -350,7 +225,7 @@ class WebinarAdmin(admin.ModelAdmin):
     def thumbnail_preview(self, obj):
         if obj.thumbnail:
             return format_html(
-                '<img src="https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{}" width="100" height="60" style="object-fit:cover;border-radius:4px;" />',
+                '<img src="https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{}" width="100" height="60" style="object-fit:cover;border-radius:4px;" />',
                 obj.thumbnail.name
             )
         return "No Thumbnail"
@@ -359,7 +234,7 @@ class WebinarAdmin(admin.ModelAdmin):
     def thumbnail_url(self, obj):
         if obj.thumbnail:
             return format_html(
-                '<a href="https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{}" target="_blank">View Thumbnail</a>',
+                '<a href="https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{}" target="_blank">View Thumbnail</a>',
                 obj.thumbnail.name
             )
         return "Not Uploaded"
@@ -371,7 +246,7 @@ class WebinarAdmin(admin.ModelAdmin):
                 "title",
                 "description",
                 "presenter",
-                "thumbnail",        # 👈 Editable field
+                "thumbnail",     
                 "thumbnail_preview",
                 "thumbnail_url",
                 "recording_link",
@@ -492,91 +367,6 @@ admin.site.register(BeginnerHubCourse, BeginnerHubCourseAdmin)
 admin.site.register(BeginnerHubVideo)
 
 
-# from django.contrib import admin
-# from .models import (
-#     BeginnerHubCourse,
-#     BeginnerHubSection,
-#     BeginnerHubVideo,
-#     BeginnerHubVideoProgress,
-# )
-
-# from django.utils.html import format_html
-# from django.utils.safestring import mark_safe
-
-# @admin.register(BeginnerHubCourse)
-# class BeginnerHubCourseAdmin(admin.ModelAdmin):
-#     list_display = ('title', 'category', 'thumbnail_preview', 'public_url_link')
-#     readonly_fields = ('thumbnail_preview', 'public_url_link')
-#     fields = (
-#         'title', 'description', 'category',
-#         'thumbnail', 'manual_thumbnail_url',
-#         'thumbnail_preview', 'public_url_link',
-#     )
-
-#     def thumbnail_preview(self, obj):
-#         if obj.thumbnail_url:
-#             return format_html('<img src="{}" width="120" style="border-radius:6px;" />', obj.thumbnail_url)
-#         return "No Thumbnail"
-
-#     def public_url_link(self, obj):
-#         if obj.thumbnail_url:
-#             return format_html('<a href="{0}" target="_blank">{0}</a>', obj.thumbnail_url)
-#         return "—"
-
-#     thumbnail_preview.short_description = "Thumbnail"
-#     public_url_link.short_description = "Thumbnail URL"
-
-
-# @admin.register(BeginnerHubSection)
-# class BeginnerHubSectionAdmin(admin.ModelAdmin):
-#     list_display = ('title', 'level', 'course')
-
-
-
-# @admin.register(BeginnerHubVideo)
-# class BeginnerHubVideoAdmin(admin.ModelAdmin):
-#     list_display = ('title', 'section', 'thumb_preview', 'public_url_link')
-#     readonly_fields = ('video_preview', 'public_url_link', 'thumb_preview', 'uploaded_at')
-#     fields = (
-#         'section', 'title', 'description',
-#         'video_file', 'manual_video_url',
-#         'thumbnail_url',
-#         'video_preview', 'thumb_preview', 'public_url_link',
-#     )
-
-#     def video_preview(self, obj):
-#         if obj.video_url:
-#             return format_html('<video src="{}" width="300" controls></video>', obj.video_url)
-#         return "No Video"
-
-#     def thumb_preview(self, obj):
-#         if obj.thumbnail_url:
-#             return format_html(
-#                 '<a href="{0}" target="_blank"><img src="{0}" style="height:70px;border-radius:6px;" /></a>',
-#                 obj.thumbnail_url,
-#             )
-#         return "—"
-
-#     def public_url_link(self, obj):
-#         if obj.video_url:
-#             return format_html('<a href="{0}" target="_blank">{0}</a>', obj.video_url)
-#         return "—"
-
-#     thumb_preview.short_description = "Video Thumbnail"
-#     public_url_link.short_description = "Video URL"
-
-
-
-
-# @admin.register(BeginnerHubVideoProgress)
-# class BeginnerHubVideoProgressAdmin(admin.ModelAdmin):
-#     list_display = ('user', 'video', 'completed')
-
-
-
-
-
-
 from django.contrib import admin
 from .models import WeeklyBriefing, TradeIdea
 
@@ -619,7 +409,7 @@ class WeeklyBriefingAdmin(admin.ModelAdmin):
     def thumbnail_preview(self, obj):
         if obj.thumbnail:
             return format_html(
-                '<img src="https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{}" width="100" height="60" style="object-fit:cover;border-radius:4px;" />',
+                '<img src="https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{}" width="100" height="60" style="object-fit:cover;border-radius:4px;" />',
                 obj.thumbnail.name
             )
         return "No Image"
@@ -628,41 +418,14 @@ class WeeklyBriefingAdmin(admin.ModelAdmin):
     def thumbnail_url(self, obj):
         if obj.thumbnail:
             return format_html(
-                '<a href="https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{}" target="_blank">View URL</a>',
+                '<a href="https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{}" target="_blank">View URL</a>',
                 obj.thumbnail.name
             )
         return "Not uploaded"
     thumbnail_url.short_description = "Thumbnail URL"
-
-# class TradeIdeaInline(admin.TabularInline):
-#     model = TradeIdea
-#     extra = 1  # Show 1 empty row for adding new
-#     fields = ('ticker', 'target_price', 'stop_loss', 'timeframe', 'direction')
-#     readonly_fields = ()  # Optional: make any of these read-only if needed
-
-
-# @admin.register(WeeklyBriefing)
-# class WeeklyBriefingAdmin(admin.ModelAdmin):
-#     list_display = ('title', 'published_date', 'duration', 'analyst_name', 'is_platinum_only', 'get_public_url')
-#     list_filter = ('published_date', 'is_platinum_only')
-#     search_fields = ('title', 'analyst_name')
-#     inlines = [TradeIdeaInline]
-#     readonly_fields = ('published_date',)
-
-#     fieldsets = (
-#         (None, {
-#             'fields': (
-#                 'title', 'video_url', 'manual_video_url', 'published_date', 'duration',
-#                 'analyst_name', 'analyst_title',
-#                 'summary', 'key_points', 'is_platinum_only',
-#             )
-#         }),
-#     )
-
-#     def get_public_url(self, obj):
-#         return obj.public_url
-#     get_public_url.short_description = "Public URL"
-
+    
+    
+    
 @admin.register(TradeIdea)
 class TradeIdeaAdmin(admin.ModelAdmin):
     list_display = ('ticker', 'briefing', 'direction', 'target_price', 'stop_loss', 'timeframe')

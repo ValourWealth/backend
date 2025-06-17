@@ -228,37 +228,6 @@ class ChallengeParticipantSerializer(serializers.ModelSerializer):
             return None
 
 
-
-
-# ********************************************************************************************************************************************************************************
-
-
-
-# /////////////////////////////////////////////////////////////////////////////////////////////////////////
-# class VideoSerializer(serializers.ModelSerializer):
-#     public_url = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = Video
-#         fields = ['id', 'title', 'description', 'video_file', 'public_url', 'uploaded_at', 'course_level']
-
-#     def get_public_url(self, obj):
-#         return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{obj.video_file.name}"
-# /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-# class VideoSerializer(serializers.ModelSerializer):
-#     public_url = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = Video
-#         fields = ['id', 'title', 'video_file', 'manual_video_url', 'public_url', 'uploaded_at', 'course_level']
-
-#     def get_public_url(self, obj):
-#         return obj.public_url
-
-# courses/serializers.py  (or wherever VideoSerializer is)
-
-# ********************************************************************************************************************************************************************************
 class VideoSerializer(serializers.ModelSerializer):
     # ---------- read‑only helpers ----------
     public_url     = serializers.SerializerMethodField()
@@ -483,40 +452,6 @@ class TrainingContactSerializer(serializers.Serializer):
 
 
 
-
-
-
-# =========================================================================================================
-# from rest_framework import serializers
-# from .models import WeeklyBriefing, TradeIdea
-
-# class TradeIdeaSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = TradeIdea
-#         fields = ['ticker', 'target_price', 'stop_loss', 'timeframe', 'direction']
-
-# # class WeeklyBriefingSerializer(serializers.ModelSerializer):
-# #     trade_ideas = TradeIdeaSerializer(many=True, read_only=True)
-
-# #     class Meta:
-# #         model = WeeklyBriefing
-# #         fields = ['id', 'title', 'video_url', 'published_date', 'duration',
-# #                   'analyst_name', 'analyst_title', 'summary', 'key_points', 'trade_ideas']
-# class WeeklyBriefingSerializer(serializers.ModelSerializer):
-#     trade_ideas = TradeIdeaSerializer(many=True, read_only=True)
-#     public_url = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = WeeklyBriefing
-#         fields = [
-#             'id', 'title', 'video_url', 'manual_video_url', 'published_date',
-#             'duration', 'analyst_name', 'analyst_title',
-#             'summary', 'key_points', 'trade_ideas', 'public_url'
-#         ]
-
-#     def get_public_url(self, obj):
-#         return obj.manual_video_url or obj.video_url
-
 from rest_framework import serializers
 from .models import WeeklyBriefing, TradeIdea
 
@@ -543,7 +478,7 @@ class WeeklyBriefingSerializer(serializers.ModelSerializer):
 
     def get_thumbnail_public_url(self, obj):
         if obj.thumbnail:
-            return f"https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/{obj.thumbnail.name}"
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{obj.thumbnail.name}"
         return None
 
 
