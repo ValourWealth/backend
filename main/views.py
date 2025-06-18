@@ -2274,6 +2274,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .models import EditorsChoice
 from .serializers import EditorsChoiceSerializer
+from rest_framework.generics import RetrieveAPIView
+
 
 
 class EditorsChoiceListView(APIView):
@@ -2283,3 +2285,11 @@ class EditorsChoiceListView(APIView):
         items = EditorsChoice.objects.order_by('-created_at')[:4]
         serializer = EditorsChoiceSerializer(items, many=True)
         return Response(serializer.data)
+
+
+
+class EditorsChoiceDetailView(RetrieveAPIView):
+    permission_classes = [AllowAny]
+    queryset = EditorsChoice.objects.all()
+    serializer_class = EditorsChoiceSerializer
+    lookup_field = 'slug'

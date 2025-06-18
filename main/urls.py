@@ -225,6 +225,7 @@ urlpatterns = [
 
   # landing page blog
    path('api/editors-choice/', EditorsChoiceListView.as_view(), name='editors-choice'),
+   path('editors-choice/<slug:slug>/', EditorsChoiceDetailView.as_view()), 
    
     # for smtp -contact us
     path('api/request-demo/', request_demo, name='request_demo'),
