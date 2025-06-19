@@ -1262,8 +1262,7 @@ def format_excel_row(row):
         to_time = str(row.get("To Time", "")).strip()
         irregular_vol = str(row.get("Irregular Vol", "")).strip()
 
-        # percent and duration from separate fields
-        percent = str(row.get("Change", "")).strip()
+        percent = str(row.get("Change %", "")).replace("$", "").strip()
         duration = str(row.get("Duration", "")).strip()
 
         return {
