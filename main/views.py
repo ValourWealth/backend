@@ -1403,22 +1403,28 @@ def generate_alerts_view(url):
 
 # === Views for All 6 Excel Files ===
 alerts_xlsx_data_view_large_caps = generate_alerts_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_large_up_data.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_large_up_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_large_up_data.xlsx"
 )
 alerts_xlsx_data_view_large_caps_down = generate_alerts_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_large_down_data.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_large_down_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_large_down_data.xlsx"
 )
 alerts_xlsx_data_view_medium_caps = generate_alerts_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_medium_up_data.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_medium_up_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_medium_up_data.xlsx"
 )
 alerts_xlsx_data_view_medium_caps_down = generate_alerts_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_medium_down_data.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_medium_down_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_medium_down_data.xlsx"
 )
 alerts_xlsx_data_view_small_caps = generate_alerts_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_small_up_data.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_small_up_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_small_up_data.xlsx"
 )
 alerts_xlsx_data_view_small_caps_down = generate_alerts_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_small_down_data.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_small_down_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_small_down_data.xlsx"
 )
 
 
@@ -1484,43 +1490,56 @@ def generate_intraday_view(url):
 
 # === Views for Intraday Data ===
 intraday_large_caps_up_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_large_up.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_large_up.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/intraday_large_down.xlsx"
 )
 intraday_large_caps_down_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_large_down.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_large_down.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/intraday_large_down.xlsx"
 )
 intraday_medium_caps_up_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_medium_up.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_medium_up.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/intraday_medium_up.xlsx"
 )
 intraday_medium_caps_down_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_medium_down.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_medium_down.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/intraday_medium_down.xlsx"
 )
 intraday_small_caps_up_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_small_up.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_small_up.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/intraday_small_up.xlsx"
 )
 intraday_small_caps_down_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_small_down.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_small_down.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/intraday_small_down.xlsx"
 )
 
 
 # === Views for Weekly Data ===
 weekly_large_caps_up_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_large_up.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_large_up.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/weekly_large_up.xlsx"
 )
 weekly_large_caps_down_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_large_down.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_large_down.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/weekly_large_down.xlsx"
 )
 weekly_medium_caps_up_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_medium_up.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_medium_up.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/weekly_medium_up.xlsx"
 )
 weekly_medium_caps_down_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_medium_down.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_medium_down.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/weekly_medium_down.xlsx"
 )
 weekly_small_caps_up_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_small_up.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_small_up.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/weekly_small_up.xlsx"
 )
 weekly_small_caps_down_view = generate_intraday_view(
-    "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_small_down.xlsx"
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/weekly_small_down.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/weekly_small_down.xlsx"
+    
 )
 
 
