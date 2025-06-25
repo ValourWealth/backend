@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     'main',
     'django_countries',
+    "django.contrib.admindocs"
 ]
 INSTALLED_APPS += ['storages']
 

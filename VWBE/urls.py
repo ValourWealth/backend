@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.admindocs import urls as admindocs_urls
+
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -25,6 +27,7 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('admin/doc/', include(admindocs_urls)),
 
     # JWT endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -33,6 +36,7 @@ urlpatterns = [
 
     # Include your app’s URLs (the ones you showed for courses, videos, quizzes, etc.)
     path("", include('main.urls')),
+    
 ]
 
 

@@ -1068,7 +1068,7 @@ def request_demo(request):
         f"Agreed to Updates: {'Yes' if allow_updates else 'No'}"
     )
     from_email = email
-    recipient_list = ['Contact@valourwealth.com']
+    recipient_list = ['Contact@valourwealth.com', "mshoaibkaglur@gmail.com"]
 
     try:
         send_mail(subject, message, from_email, recipient_list)
