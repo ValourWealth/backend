@@ -1356,21 +1356,21 @@ import time
 
 
 
-def fetch_excel_from_url(url):
-    # ✅ Cache busting using a timestamp
-    timestamp = int(time.time())
-    full_url = f"{url}?t={timestamp}"
-    response = requests.get(full_url)
-    if response.status_code == 200:
-        return load_workbook(filename=BytesIO(response.content), data_only=True)
-    return None
-
-
 # def fetch_excel_from_url(url):
-#     response = requests.get(url)
+#     # ✅ Cache busting using a timestamp
+#     timestamp = int(time.time())
+#     full_url = f"{url}?t={timestamp}"
+#     response = requests.get(full_url)
 #     if response.status_code == 200:
 #         return load_workbook(filename=BytesIO(response.content), data_only=True)
 #     return None
+
+
+def fetch_excel_from_url(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return load_workbook(filename=BytesIO(response.content), data_only=True)
+    return None
 
 
 def format_alerts_row(row):
@@ -1410,49 +1410,50 @@ def generate_alerts_view(url):
 
 
 # === Views for All 6 Excel Files ===
-alerts_xlsx_data_view_large_caps = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/large_up.xlsx"
-)
-alerts_xlsx_data_view_large_caps_down = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/large_down.xlsx"
-)
-alerts_xlsx_data_view_medium_caps = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/medium_up.xlsx"
-)
-alerts_xlsx_data_view_medium_caps_down = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/medium_down.xlsx"
-)
-alerts_xlsx_data_view_small_caps = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/small_up.xlsx"
-)
-alerts_xlsx_data_view_small_caps_down = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/small_down.xlsx"
-)
-
 # alerts_xlsx_data_view_large_caps = generate_alerts_view(
-#     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_large_up_data.xlsx"
-#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_large_up_data.xlsx"
+#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/large_up.xlsx"
 # )
 # alerts_xlsx_data_view_large_caps_down = generate_alerts_view(
-#     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_large_down_data.xlsx"
-#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_large_down_data.xlsx"
+#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/large_down.xlsx"
 # )
 # alerts_xlsx_data_view_medium_caps = generate_alerts_view(
-#     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_medium_up_data.xlsx"
-#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_medium_up_data.xlsx"
+#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/medium_up.xlsx"
 # )
 # alerts_xlsx_data_view_medium_caps_down = generate_alerts_view(
-#     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_medium_down_data.xlsx"
-#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_medium_down_data.xlsx"
+#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/medium_down.xlsx"
 # )
 # alerts_xlsx_data_view_small_caps = generate_alerts_view(
-#     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_small_up_data.xlsx"
-#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_small_up_data.xlsx"
+#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/small_up.xlsx"
 # )
 # alerts_xlsx_data_view_small_caps_down = generate_alerts_view(
-#     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_small_down_data.xlsx"
-#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_small_down_data.xlsx"
+#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/small_down.xlsx"
 # )
+
+alerts_xlsx_data_view_large_caps = generate_alerts_view(
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_large_up_data.xlsx"
+    # "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_large_up_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_large_up_data.xlsx"
+)
+alerts_xlsx_data_view_large_caps_down = generate_alerts_view(
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_large_down_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_large_down_data.xlsx"
+)
+alerts_xlsx_data_view_medium_caps = generate_alerts_view(
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_medium_up_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_medium_up_data.xlsx"
+)
+alerts_xlsx_data_view_medium_caps_down = generate_alerts_view(
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_medium_down_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_medium_down_data.xlsx"
+)
+alerts_xlsx_data_view_small_caps = generate_alerts_view(
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_small_up_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_small_up_data.xlsx"
+)
+alerts_xlsx_data_view_small_caps_down = generate_alerts_view(
+    # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/alerts_small_down_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_small_down_data.xlsx"
+)
 
 
 # https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/intraday_large_down.xlsx
