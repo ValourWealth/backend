@@ -1409,22 +1409,22 @@ def generate_alerts_view(url):
 
 # === Views for All 6 Excel Files ===
 alerts_xlsx_data_view_large_caps = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_large_up_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/large_up.xlsx"
 )
 alerts_xlsx_data_view_large_caps_down = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_large_down_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/large_down.xlsx"
 )
 alerts_xlsx_data_view_medium_caps = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_medium_up_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/medium_up.xlsx"
 )
 alerts_xlsx_data_view_medium_caps_down = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_medium_down_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/medium_down.xlsx"
 )
 alerts_xlsx_data_view_small_caps = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_small_up_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/small_up.xlsx"
 )
 alerts_xlsx_data_view_small_caps_down = generate_alerts_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_small_down_data.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts/small_down.xlsx"
 )
 
 # alerts_xlsx_data_view_large_caps = generate_alerts_view(
