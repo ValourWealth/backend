@@ -1356,19 +1356,21 @@ import time
 
 
 
-# def fetch_excel_from_url(url):
-#     # Add a cache-busting timestamp to force fresh download
-#     timestamp = int(time.time())
-#     response = requests.get(f"{url}?t={timestamp}")
-#     if response.status_code == 200:
-#         return load_workbook(filename=BytesIO(response.content), data_only=True)
-#     return None
-
 def fetch_excel_from_url(url):
-    response = requests.get(url)
+    # ✅ Cache busting using a timestamp
+    timestamp = int(time.time())
+    full_url = f"{url}?t={timestamp}"
+    response = requests.get(full_url)
     if response.status_code == 200:
         return load_workbook(filename=BytesIO(response.content), data_only=True)
     return None
+
+
+# def fetch_excel_from_url(url):
+#     response = requests.get(url)
+#     if response.status_code == 200:
+#         return load_workbook(filename=BytesIO(response.content), data_only=True)
+#     return None
 
 
 def format_alerts_row(row):
