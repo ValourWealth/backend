@@ -82,6 +82,33 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+# =====================================================================================================================================
+from rest_framework import serializers
+from .models import PlatformWalkthroughVideo
+
+class PlatformWalkthroughVideoSerializer(serializers.ModelSerializer):
+    video_url = serializers.ReadOnlyField()
+    thumbnail_url = serializers.ReadOnlyField()
+
+    class Meta:
+        model = PlatformWalkthroughVideo
+        fields = [
+            "id",
+            "title",
+            "description",
+            "author_name",
+            "author_role",
+            "author_image",
+            "schedule_days",
+            "schedule_time",
+            "is_verified",
+            "uploaded_at",
+            "video_url",
+            "thumbnail_url",
+        ]
+
+
+
 
 # ********************************************************************************************************************************************************************************
 

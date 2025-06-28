@@ -444,3 +444,12 @@ class EditorsChoiceAdmin(admin.ModelAdmin):
     search_fields = ['title', 'category']
     list_filter = ['category']
     prepopulated_fields = {"slug": ("title",)}
+
+
+from django.contrib import admin
+from .models import PlatformWalkthroughVideo
+
+@admin.register(PlatformWalkthroughVideo)
+class PlatformWalkthroughVideoAdmin(admin.ModelAdmin):
+    list_display = ("title", "author_name", "schedule_days", "schedule_time", "uploaded_at")
+    search_fields = ("title", "description", "author_name")

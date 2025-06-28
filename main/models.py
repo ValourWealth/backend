@@ -335,6 +335,56 @@ class AnalystMessage(models.Model):
         return f"{self.sender.username}: {self.content[:20]}"
 
     
+    
+    
+    
+
+# =================================================================================================================================
+class PlatformWalkthroughVideo(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+
+    video_file = models.FileField(storage=R2Storage(), upload_to='walkthrough_videos/', null=True, blank=True)
+    manual_video_url = models.URLField(null=True, blank=True)
+
+    thumbnail_file = models.ImageField(storage=R2Storage(), upload_to='walkthrough_thumbnails/', null=True, blank=True)
+    manual_thumbnail_url = models.URLField(null=True, blank=True)
+
+    author_name = models.CharField(max_length=100, default="Jack G")
+    author_role = models.CharField(max_length=100, default="ValourWealth Analyst")
+    author_image = models.URLField()
+
+    schedule_days = models.CharField(max_length=255, default="Monday to Friday")
+    schedule_time = models.CharField(max_length=100, default="7:00pm - 8:00pm EST")
+    is_verified = models.BooleanField(default=True)
+
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def video_url(self):
+        if self.video_file and getattr(self.video_file, 'name', '').strip():
+            name = self.video_file.name.replace("valourswealth/", "")
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{name}"
+        elif self.manual_video_url:
+            return self.manual_video_url
+        return None
+
+    @property
+    def thumbnail_url(self):
+        if self.thumbnail_file and getattr(self.thumbnail_file, 'name', '').strip():
+            name = self.thumbnail_file.name.replace("valourswealth/", "")
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{name}"
+        elif self.manual_thumbnail_url:
+            return self.manual_thumbnail_url
+        return None
+
+    
+    
+    
+    
 
 # =========================================================================================================
 # for scheduling calling with analyst

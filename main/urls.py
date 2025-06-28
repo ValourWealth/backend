@@ -169,7 +169,8 @@ urlpatterns = [
     path('user/courses/progress/', all_courses_progress, name='all-courses-progress'),
 
 
-
+    # platfomr walkthrough
+    path('platform-walkthrough/', PlatformWalkthroughVideoListView.as_view(), name='platform-walkthrough-list'),
 
     # For Platinum Member:
     path('api/trade-journal/', TradeJournalListCreateView.as_view(), name='trade-journal'),
@@ -213,6 +214,7 @@ urlpatterns = [
 
     # For platinum member weekly briefing
     path("api/weekly-briefings/", PlatinumBriefingListAPIView.as_view(), name="weekly-briefings"),
+
 
     # For News 
     path("api/market-news/", MarketNewsAPIView.as_view(), name="market-news"), 
