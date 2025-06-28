@@ -170,7 +170,7 @@ urlpatterns = [
 
 
     # platfomr walkthrough
-    path('platform-walkthrough/', PlatformWalkthroughVideoListView.as_view(), name='platform-walkthrough-list'),
+    path('api/platform-walkthrough/', PlatformWalkthroughVideoListView.as_view(), name='platform-walkthrough-list'),
 
     # For Platinum Member:
     path('api/trade-journal/', TradeJournalListCreateView.as_view(), name='trade-journal'),
