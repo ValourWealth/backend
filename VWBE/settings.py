@@ -35,7 +35,7 @@ ALLOWED_HOSTS = [
     "*",
     "https://backend-production-1e63.up.railway.app",
     "https://valourwealth-frontend-psi.vercel.app",
-    "https://frontend-5p4eshae1-valourwealths-projects.vercel.app",
+    "https://tradegptlatest.vercel.app",
 ]
 
 # This is for cloudflare video storage configurations:
@@ -163,7 +163,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://192.168.1.12:3000",
     "https://backend-production-1e63.up.railway.app",
     "https://valourwealth-frontend-psi.vercel.app",
-    "https://frontend-5p4eshae1-valourwealths-projects.vercel.app",
+    "https://tradegptlatest.vercel.app",
 ]
 
 
