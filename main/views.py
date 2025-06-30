@@ -334,33 +334,37 @@ def assigned_analyst(request):
     })
 
 
-# ✅ LIST for analyst: show chats with only non-analyst platinum members
 @api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def ensure_analyst_chat(request):
     user = request.user
-    profile = getattr(user, 'profile', None)
+    user_profile = getattr(user, 'profile', None)
 
-    if not profile:
+    if not user_profile:
         return Response({"error": "No profile found"}, status=403)
 
-    if profile.role == 'analyst':
-        # ✅ Exclude other analysts from being in chat list
+    # ✅ If user is analyst (can be platinum too)
+    if user_profile.role == 'analyst':
         chats = AnalystChat.objects.filter(
             analyst=user
         ).exclude(
-            user__profile__role='analyst'
+            user=user  # ❌ Exclude self chat (user == analyst)
+        ).exclude(
+            user__profile__role='analyst'  # ❌ Don't show chats with other analysts
         )
         serializer = AnalystChatSerializer(chats, many=True)
         return Response(serializer.data)
 
-    elif profile.subscription_status == 'platinum' and profile.role != 'analyst':
-        # Regular platinum member flow
+    # ✅ If user is platinum only (not analyst)
+    elif user_profile.subscription_status == 'platinum' and user_profile.role != 'analyst':
         analyst_profile = UserProfiles.objects.filter(role='analyst').first()
         if not analyst_profile:
             return Response({"error": "No analyst found."}, status=404)
 
-        chat, _ = AnalystChat.objects.get_or_create(user=user, analyst=analyst_profile.user)
+        chat, created = AnalystChat.objects.get_or_create(
+            user=user,
+            analyst=analyst_profile.user
+        )
         serializer = AnalystChatSerializer(chat)
         return Response(serializer.data)
 
