@@ -271,21 +271,22 @@ def start_analyst_chat(request):
     return Response(serializer.data)
 
 
-# ✅ RETRIEVE one-to-one chat for platinum member (not analyst)
 class AnalystChatDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AnalystChatSerializer
 
     def get_object(self):
         user = self.request.user
-        profile = getattr(user, 'profile', None)
 
-        if not profile or profile.subscription_status != 'platinum' or profile.role == 'analyst':
-            raise PermissionDenied("Only platinum members (not analysts) can access this chat.")
-
-        chat = AnalystChat.objects.filter(user=user).first()
-        if not chat:
+        try:
+            chat = AnalystChat.objects.get(user=user)
+        except AnalystChat.DoesNotExist:
             raise NotFound("No chat found for this user.")
+
+        # ✅ Allow only if user is participant (as client)
+        if chat.user != user:
+            raise PermissionDenied("You are not allowed to access this chat.")
+
         return chat
 
 
