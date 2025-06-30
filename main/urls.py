@@ -191,6 +191,8 @@ urlpatterns = [
     path("api/analyst-chat/send/", AnalystMessageCreateView.as_view()),
     path("api/assigned-analyst/", assigned_analyst, name="assigned_analyst"),
     path("api/analyst-chat/ensure/", ensure_analyst_chat),
+    path('analyst-messages/', AnalystMessageListView.as_view(), name='analyst-messages'),
+
 
     # for session call
     path('api/', include(routersch.urls)),

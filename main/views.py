@@ -371,6 +371,32 @@ def ensure_analyst_chat(request):
 
     return Response({"error": "Unauthorized"}, status=403)
 
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
+from .models import AnalystMessage
+from .serializers import AnalystMessageSerializer
+
+class AnalystMessageListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AnalystMessageSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        chat_id = self.request.query_params.get("chat")
+
+        if not chat_id:
+            return AnalystMessage.objects.none()
+
+        return AnalystMessage.objects.filter(
+            chat_id=chat_id,
+        ).filter(
+            models.Q(sender=user) |
+            models.Q(chat__analyst=user) |
+            models.Q(chat__user=user)
+        ).order_by("timestamp")
+
+
+
 # from rest_framework.decorators import api_view, permission_classes
 # from rest_framework.permissions import IsAuthenticated
 # from rest_framework.response import Response
