@@ -344,7 +344,7 @@ def assigned_analyst(request):
         "profile_photo_url": analyst_profile.profile_photo_public_url
     })
 
-
+from django.db.models import Q
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def ensure_analyst_chat(request):
@@ -355,24 +355,63 @@ def ensure_analyst_chat(request):
         return Response({"error": "No profile found"}, status=403)
 
     if user_profile.role == 'analyst':
-        # ✅ Analyst: Return all assigned chats
-        chats = AnalystChat.objects.filter(analyst=user)
+        # ✅ Analyst: Show chats with non-analyst platinum users only
+        chats = AnalystChat.objects.filter(
+            analyst=user
+        ).exclude(
+            user__profile__role='analyst'
+        )
         serializer = AnalystChatSerializer(chats, many=True)
         return Response(serializer.data)
 
-    elif user_profile.subscription_status == 'platinum':
-        # ✅ Platinum: Ensure 1-on-1 chat with analyst
+    elif user_profile.subscription_status == 'platinum' and user_profile.role != 'analyst':
+        # ✅ Platinum Member (not an analyst): Ensure 1-on-1 chat
         analyst_profile = UserProfiles.objects.filter(role='analyst').first()
         if not analyst_profile:
             return Response({"error": "No analyst found."}, status=404)
 
         chat, created = AnalystChat.objects.get_or_create(
-            user=user, analyst=analyst_profile.user
+            user=user,
+            analyst=analyst_profile.user
         )
         serializer = AnalystChatSerializer(chat)
         return Response(serializer.data)
 
     return Response({"error": "Unauthorized"}, status=403)
+
+
+# @api_view(['GET'])
+# @permission_classes([permissions.IsAuthenticated])
+# def ensure_analyst_chat(request):
+#     user = request.user
+#     user_profile = getattr(user, 'profile', None)
+
+#     if not user_profile:
+#         return Response({"error": "No profile found"}, status=403)
+
+#     if user_profile.role == 'analyst':
+#         # chats = AnalystChat.objects.filter(analyst=user)
+#         chats = AnalystChat.objects.filter(
+#         analyst=user).exclude(
+#         user__profile__role='analyst'  # Exclude if the user is also an analyst
+# )
+
+#         serializer = AnalystChatSerializer(chats, many=True)
+#         return Response(serializer.data)
+
+#     elif user_profile.subscription_status == 'platinum':
+#         # ✅ Platinum: Ensure 1-on-1 chat with analyst
+#         analyst_profile = UserProfiles.objects.filter(role='analyst').first()
+#         if not analyst_profile:
+#             return Response({"error": "No analyst found."}, status=404)
+
+#         chat, created = AnalystChat.objects.get_or_create(
+#             user=user, analyst=analyst_profile.user
+#         )
+#         serializer = AnalystChatSerializer(chat)
+#         return Response(serializer.data)
+
+#     return Response({"error": "Unauthorized"}, status=403)
         
 # ********************************************************************************************************************************************************************************
         
