@@ -241,68 +241,55 @@ class SendMessageView(generics.CreateAPIView):
 
         
 # One to one chat(platinum member user to analyst)
+from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
-from .models import Conversation
-from .serializers import ConversationSerializer
-from .models import UserProfiles  
-from django.db.models import Count
-
-User = get_user_model()
-from rest_framework import generics, permissions
-from .models import AnalystChat, AnalystMessage
+from .models import AnalystChat, AnalystMessage, UserProfiles
 from .serializers import AnalystChatSerializer, AnalystMessageSerializer
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from django.contrib.auth import get_user_model
-from .models import UserProfiles
 
 User = get_user_model()
 
+# ✅ START chat or RETURN existing (only for platinum members, not analysts)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def start_analyst_chat(request):
     user = request.user
+    profile = getattr(user, 'profile', None)
 
-    if not hasattr(user, 'profile') or user.profile.subscription_status != 'platinum':
-        return Response({"error": "Only platinum members can chat with analysts."}, status=403)
+    if not profile or profile.subscription_status != 'platinum' or profile.role == 'analyst':
+        return Response({"error": "Only platinum members (not analysts) can start chat."}, status=403)
 
     analyst_profile = UserProfiles.objects.filter(role='analyst').first()
     if not analyst_profile:
         return Response({"error": "No analyst found."}, status=404)
 
-    chat, created = AnalystChat.objects.get_or_create(user=user, analyst=analyst_profile.user)
+    chat, _ = AnalystChat.objects.get_or_create(user=user, analyst=analyst_profile.user)
     serializer = AnalystChatSerializer(chat)
     return Response(serializer.data)
 
+
+# ✅ RETRIEVE one-to-one chat for platinum member (not analyst)
 class AnalystChatDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AnalystChatSerializer
 
     def get_object(self):
         user = self.request.user
-        if not hasattr(user, 'profile') or user.profile.subscription_status != 'platinum':
-            raise PermissionDenied("Only platinum members can access this chat.")
+        profile = getattr(user, 'profile', None)
+
+        if not profile or profile.subscription_status != 'platinum' or profile.role == 'analyst':
+            raise PermissionDenied("Only platinum members (not analysts) can access this chat.")
 
         chat = AnalystChat.objects.filter(user=user).first()
         if not chat:
             raise NotFound("No chat found for this user.")
         return chat
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from .models import AnalystChat
-from .serializers import AnalystChatSerializer
 
-
-
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
+# ✅ Analyst sending or receiving message (must be a participant)
 class AnalystMessageCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -316,7 +303,6 @@ class AnalystMessageCreateView(APIView):
         except AnalystChat.DoesNotExist:
             return Response({"error": "Invalid chat ID"}, status=404)
 
-        # Enforce strict participation: only user or analyst involved can send
         if chat.user != user and chat.analyst != user:
             return Response({"error": "Unauthorized access to this chat"}, status=403)
 
@@ -326,17 +312,18 @@ class AnalystMessageCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        
+
+# ✅ Assigned analyst (for platinum member)
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated])
 def assigned_analyst(request):
     user = request.user
-    if not hasattr(user, 'profile') or user.profile.subscription_status != 'platinum':
+    profile = getattr(user, 'profile', None)
+
+    if not profile or profile.subscription_status != 'platinum' or profile.role == 'analyst':
         return Response({"error": "Unauthorized"}, status=403)
 
-    from .models import UserProfiles
     analyst_profile = UserProfiles.objects.filter(role='analyst').first()
-
     if not analyst_profile:
         return Response({"error": "No analyst found"}, status=404)
 
@@ -346,18 +333,19 @@ def assigned_analyst(request):
         "profile_photo_url": analyst_profile.profile_photo_public_url
     })
 
-from django.db.models import Q
+
+# ✅ LIST for analyst: show chats with only non-analyst platinum members
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def ensure_analyst_chat(request):
     user = request.user
-    user_profile = getattr(user, 'profile', None)
+    profile = getattr(user, 'profile', None)
 
-    if not user_profile:
+    if not profile:
         return Response({"error": "No profile found"}, status=403)
 
-    if user_profile.role == 'analyst':
-        # ✅ Analyst: Show chats with non-analyst platinum users only
+    if profile.role == 'analyst':
+        # ✅ Exclude other analysts from being in chat list
         chats = AnalystChat.objects.filter(
             analyst=user
         ).exclude(
@@ -366,20 +354,166 @@ def ensure_analyst_chat(request):
         serializer = AnalystChatSerializer(chats, many=True)
         return Response(serializer.data)
 
-    elif user_profile.subscription_status == 'platinum' and user_profile.role != 'analyst':
-        # ✅ Platinum Member (not an analyst): Ensure 1-on-1 chat
+    elif profile.subscription_status == 'platinum' and profile.role != 'analyst':
+        # Regular platinum member flow
         analyst_profile = UserProfiles.objects.filter(role='analyst').first()
         if not analyst_profile:
             return Response({"error": "No analyst found."}, status=404)
 
-        chat, created = AnalystChat.objects.get_or_create(
-            user=user,
-            analyst=analyst_profile.user
-        )
+        chat, _ = AnalystChat.objects.get_or_create(user=user, analyst=analyst_profile.user)
         serializer = AnalystChatSerializer(chat)
         return Response(serializer.data)
 
     return Response({"error": "Unauthorized"}, status=403)
+
+# from rest_framework.decorators import api_view, permission_classes
+# from rest_framework.permissions import IsAuthenticated
+# from rest_framework.response import Response
+# from django.contrib.auth import get_user_model
+# from .models import Conversation
+# from .serializers import ConversationSerializer
+# from .models import UserProfiles  
+# from django.db.models import Count
+
+# User = get_user_model()
+# from rest_framework import generics, permissions
+# from .models import AnalystChat, AnalystMessage
+# from .serializers import AnalystChatSerializer, AnalystMessageSerializer
+# from rest_framework.decorators import api_view, permission_classes
+# from rest_framework.response import Response
+# from django.contrib.auth import get_user_model
+# from .models import UserProfiles
+
+# User = get_user_model()
+
+# @api_view(['POST'])
+# @permission_classes([permissions.IsAuthenticated])
+# def start_analyst_chat(request):
+#     user = request.user
+
+#     if not hasattr(user, 'profile') or user.profile.subscription_status != 'platinum':
+#         return Response({"error": "Only platinum members can chat with analysts."}, status=403)
+
+#     analyst_profile = UserProfiles.objects.filter(role='analyst').first()
+#     if not analyst_profile:
+#         return Response({"error": "No analyst found."}, status=404)
+
+#     chat, created = AnalystChat.objects.get_or_create(user=user, analyst=analyst_profile.user)
+#     serializer = AnalystChatSerializer(chat)
+#     return Response(serializer.data)
+
+# class AnalystChatDetailView(generics.RetrieveAPIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#     serializer_class = AnalystChatSerializer
+
+#     def get_object(self):
+#         user = self.request.user
+#         if not hasattr(user, 'profile') or user.profile.subscription_status != 'platinum':
+#             raise PermissionDenied("Only platinum members can access this chat.")
+
+#         chat = AnalystChat.objects.filter(user=user).first()
+#         if not chat:
+#             raise NotFound("No chat found for this user.")
+#         return chat
+
+# from rest_framework.decorators import api_view, permission_classes
+# from rest_framework.permissions import IsAuthenticated
+# from rest_framework.response import Response
+# from .models import AnalystChat
+# from .serializers import AnalystChatSerializer
+
+
+
+
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# class AnalystMessageCreateView(APIView):
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def post(self, request):
+#         user = request.user
+#         data = request.data.copy()
+#         chat_id = data.get("chat")
+
+#         try:
+#             chat = AnalystChat.objects.get(id=chat_id)
+#         except AnalystChat.DoesNotExist:
+#             return Response({"error": "Invalid chat ID"}, status=404)
+
+#         # Enforce strict participation: only user or analyst involved can send
+#         if chat.user != user and chat.analyst != user:
+#             return Response({"error": "Unauthorized access to this chat"}, status=403)
+
+#         serializer = AnalystMessageSerializer(data=data)
+#         if serializer.is_valid():
+#             serializer.save(sender=user)
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def assigned_analyst(request):
+#     user = request.user
+#     if not hasattr(user, 'profile') or user.profile.subscription_status != 'platinum':
+#         return Response({"error": "Unauthorized"}, status=403)
+
+#     from .models import UserProfiles
+#     analyst_profile = UserProfiles.objects.filter(role='analyst').first()
+
+#     if not analyst_profile:
+#         return Response({"error": "No analyst found"}, status=404)
+
+#     return Response({
+#         "id": analyst_profile.user.id,
+#         "username": analyst_profile.user.username,
+#         "profile_photo_url": analyst_profile.profile_photo_public_url
+#     })
+
+# from django.db.models import Q
+# from rest_framework.decorators import api_view, permission_classes
+# from rest_framework.permissions import IsAuthenticated
+# from rest_framework.response import Response
+# from rest_framework import status
+# from .models import AnalystChat, UserProfiles
+# from .serializers import AnalystChatSerializer
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def ensure_analyst_chat(request):
+#     user = request.user
+#     user_profile = getattr(user, 'profile', None)
+
+#     if not user_profile:
+#         return Response({"error": "No profile found"}, status=403)
+
+#     # 👇 If current user is an ANALYST
+#     if user_profile.role == 'analyst':
+#         # ✅ Show chats where analyst is current user, and the OTHER user is NOT an analyst
+#         chats = AnalystChat.objects.filter(
+#             analyst=user
+#         ).exclude(
+#             user__profile__role='analyst'  # 💥 This excludes dual-role analysts from showing up
+#         )
+#         serializer = AnalystChatSerializer(chats, many=True)
+#         return Response(serializer.data)
+
+#     # 👇 If current user is a platinum MEMBER (not analyst)
+#     elif user_profile.subscription_status == 'platinum' and user_profile.role != 'analyst':
+#         # Get any available analyst (you could add logic for assignment)
+#         analyst_profile = UserProfiles.objects.filter(role='analyst').first()
+#         if not analyst_profile:
+#             return Response({"error": "No analyst found."}, status=404)
+
+#         chat, created = AnalystChat.objects.get_or_create(
+#             user=user,
+#             analyst=analyst_profile.user
+#         )
+#         serializer = AnalystChatSerializer(chat)
+#         return Response(serializer.data)
+
+#     return Response({"error": "Unauthorized"}, status=403)
 
 
 # @api_view(['GET'])
