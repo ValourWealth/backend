@@ -37,6 +37,8 @@ ALLOWED_HOSTS = [
     "https://valourwealth-frontend-psi.vercel.app",
     "https://tradegptlatest.vercel.app",
     "https://tradegptbackend-production.up.railway.app",
+    "https://latestnewtradegptversion.vercel.app",
+    
 ]
 
 
@@ -167,6 +169,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://valourwealth-frontend-psi.vercel.app",
     "https://tradegptlatest.vercel.app",
     "https://tradegptbackend-production.up.railway.app",
+    "https://latestnewtradegptversion.vercel.app",
 ]
 
 
