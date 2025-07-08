@@ -140,7 +140,7 @@ class TradeGPTTokenView(APIView):
 # ********************************************************************************************************************************************************************************
 # **************************************************Platinum member****************************************************************************************************************************************************
 
-import random  #for random user 
+
 from rest_framework import generics, permissions
 from .models import TradeJournalEntry
 from .serializers import TradeJournalEntrySerializer
@@ -164,6 +164,7 @@ from .serializers import WebinarSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+import random  #for random user 
 
 
 class WebinarViewSet(viewsets.ModelViewSet):
@@ -255,6 +256,7 @@ from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 # this is for the group chat 
 class MyConversationsView(generics.ListAPIView):
     serializer_class = ConversationSerializer
