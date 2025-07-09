@@ -301,6 +301,9 @@ urlpatterns = [
     path('api/weekly/small_caps_down/', weekly_small_caps_down_view, name='weekly_small_caps_down'),
 
 
+  # Ticker api
+    path("api/tickers/", tickers_data_view),
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
