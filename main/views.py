@@ -184,56 +184,35 @@ class WebinarRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = WebinarSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-# @api_view(['POST'])
-# @permission_classes([permissions.IsAuthenticated])
-# def register_for_webinar(request, pk):
-#     try:
-#         webinar = Webinar.objects.get(pk=pk)
-#         webinar.registered_users.add(request.user)
-#         return Response({"success": True, "registered_count": webinar.registered_count()})
-#     except Webinar.DoesNotExist:
-#         return Response({"error": "Webinar not found"}, status=404)
-
-# this is with the random user fake user populated the webinars with math random 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def register_for_webinar(request, pk):
     try:
         webinar = Webinar.objects.get(pk=pk)
         webinar.registered_users.add(request.user)
-
-        real_count = webinar.registered_users.count()
-        base_fake = random.randint(100, 200)  # simulate 100+ users
-        display_count = real_count + base_fake
-
-        return Response({
-            "success": True,
-            "real_count": real_count,
-            "display_count": display_count
-        })
+        return Response({"success": True, "registered_count": webinar.registered_count()})
     except Webinar.DoesNotExist:
         return Response({"error": "Webinar not found"}, status=404)
 
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def unregister_from_webinar(request, pk):
-    try:
-        webinar = Webinar.objects.get(pk=pk)
-        webinar.registered_users.remove(request.user)
+# this is with the random user fake user populated the webinars with math random 
+# @api_view(['POST'])
+# @permission_classes([permissions.IsAuthenticated])
+# def register_for_webinar(request, pk):
+#     try:
+#         webinar = Webinar.objects.get(pk=pk)
+#         webinar.registered_users.add(request.user)
 
-        real_count = webinar.registered_users.count()
-        base_fake = random.randint(100, 200)
-        display_count = real_count + base_fake
+#         real_count = webinar.registered_users.count()
+#         base_fake = random.randint(100, 200)  # simulate 100+ users
+#         display_count = real_count + base_fake
 
-        return Response({
-            "success": True,
-            "real_count": real_count,
-            "display_count": display_count,
-            "already_registered": False
-        })
-    except Webinar.DoesNotExist:
-        return Response({"error": "Webinar not found"}, status=404)
-
+#         return Response({
+#             "success": True,
+#             "real_count": real_count,
+#             "display_count": display_count
+#         })
+#     except Webinar.DoesNotExist:
+#         return Response({"error": "Webinar not found"}, status=404)
 
 # @api_view(['POST'])
 # @permission_classes([permissions.IsAuthenticated])
@@ -241,13 +220,34 @@ def unregister_from_webinar(request, pk):
 #     try:
 #         webinar = Webinar.objects.get(pk=pk)
 #         webinar.registered_users.remove(request.user)
+
+#         real_count = webinar.registered_users.count()
+#         base_fake = random.randint(100, 200)
+#         display_count = real_count + base_fake
+
 #         return Response({
 #             "success": True,
-#             "registered_count": webinar.registered_count(),
+#             "real_count": real_count,
+#             "display_count": display_count,
 #             "already_registered": False
 #         })
 #     except Webinar.DoesNotExist:
 #         return Response({"error": "Webinar not found"}, status=404)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def unregister_from_webinar(request, pk):
+    try:
+        webinar = Webinar.objects.get(pk=pk)
+        webinar.registered_users.remove(request.user)
+        return Response({
+            "success": True,
+            "registered_count": webinar.registered_count(),
+            "already_registered": False
+        })
+    except Webinar.DoesNotExist:
+        return Response({"error": "Webinar not found"}, status=404)
 
     
     
