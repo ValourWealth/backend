@@ -303,6 +303,7 @@ urlpatterns = [
 
   # Ticker api
     path("api/tickers/", tickers_data_view),
+    path('api/tickers/data/', ticker_data_api, name='tickers-data'),
 
 ]
 
