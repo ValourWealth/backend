@@ -256,9 +256,9 @@ urlpatterns = [
 
 
     # UpTrend api
-    path('api/Large_caps/', xlsx_data_view_large_caps, name='xlsx_data_view_large_caps'),
-    path('api/Medium_caps/', xlsx_data_view_medium_caps, name='xlsx_data_view_medium_caps'),
-    path('api/Small_caps/', xlsx_data_view_small_caps, name='xlsx_data_view_small_caps'),
+    path('api/large_caps/', xlsx_data_view_large_caps, name='xlsx_data_view_large_caps'),
+    path('api/medium_caps/', xlsx_data_view_medium_caps, name='xlsx_data_view_medium_caps'),
+    path('api/small_caps/', xlsx_data_view_small_caps, name='xlsx_data_view_small_caps'),
 
     # Downtrend APIs
     path('api/large_caps_down/', xlsx_data_view_large_caps_down, name='xlsx_data_view_large_caps_down'),
