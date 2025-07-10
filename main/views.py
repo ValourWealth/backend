@@ -1616,70 +1616,70 @@ weekly_small_caps_down_view = generate_intraday_view(
 
 
 # ==================================================================Today Ticker api view====================
-import openpyxl
-from django.http import JsonResponse
-from openpyxl import load_workbook
-from io import BytesIO
-import requests
+# import openpyxl
+# from django.http import JsonResponse
+# from openpyxl import load_workbook
+# from io import BytesIO
+# import requests
 
-# Step 1: Download Excel from R2
-def fetch_excel_from_url(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        return load_workbook(filename=BytesIO(response.content), data_only=True)
-    return None
+# # Step 1: Download Excel from R2
+# def fetch_excel_from_url(url):
+#     response = requests.get(url)
+#     if response.status_code == 200:
+#         return load_workbook(filename=BytesIO(response.content), data_only=True)
+#     return None
 
-# Step 2: Clean row dictionary
-def format_ticker_excel_row(row):
-    try:
-        return {
-            "symbol": row.get("Symbol", "").strip(),
-            "company": row.get("Company", "").strip(),
-            "sentiment": row.get("Sentiment", "").strip(),
-            "sentiment_label": row.get("SentimentLabel", "").strip(),
-            "news_sentiment": row.get("NewsSentiment", "").strip(),
-            "contract": row.get("Contract", "").strip(),
-            "cp": row.get("C/P", "").strip(),
-            "strike": row.get("Strike", ""),
-            "price": row.get("Price", ""),
-            "expiry": row.get("Expiry", "").strip(),
-            "volume": row.get("Volume", ""),
-            "itm": row.get("ITM%", "").strip()
-        }
-    except Exception as e:
-        print(f"❌ Error parsing row: {e}")
-        return {}
+# # Step 2: Clean row dictionary
+# def format_ticker_excel_row(row):
+#     try:
+#         return {
+#             "symbol": row.get("Symbol", "").strip(),
+#             "company": row.get("Company", "").strip(),
+#             "sentiment": row.get("Sentiment", "").strip(),
+#             "sentiment_label": row.get("SentimentLabel", "").strip(),
+#             "news_sentiment": row.get("NewsSentiment", "").strip(),
+#             "contract": row.get("Contract", "").strip(),
+#             "cp": row.get("C/P", "").strip(),
+#             "strike": row.get("Strike", ""),
+#             "price": row.get("Price", ""),
+#             "expiry": row.get("Expiry", "").strip(),
+#             "volume": row.get("Volume", ""),
+#             "itm": row.get("ITM%", "").strip()
+#         }
+#     except Exception as e:
+#         print(f"❌ Error parsing row: {e}")
+#         return {}
 
-# Step 3: Parse workbook
-def parse_excel_data(workbook):
-    sheet = workbook.active
-    headers = [cell.value for cell in next(sheet.iter_rows(min_row=1, max_row=1))]
-    results = []
+# # Step 3: Parse workbook
+# def parse_excel_data(workbook):
+#     sheet = workbook.active
+#     headers = [cell.value for cell in next(sheet.iter_rows(min_row=1, max_row=1))]
+#     results = []
 
-    for row in sheet.iter_rows(min_row=2, values_only=True):
-        row_data = dict(zip(headers, row))
-        if any(row_data.values()):
-            formatted = format_ticker_excel_row(row_data)
-            if formatted:
-                results.append(formatted)
-    return results
+#     for row in sheet.iter_rows(min_row=2, values_only=True):
+#         row_data = dict(zip(headers, row))
+#         if any(row_data.values()):
+#             formatted = format_ticker_excel_row(row_data)
+#             if formatted:
+#                 results.append(formatted)
+#     return results
 
-# Step 4: Generate view
-def generate_excel_view(url):
-    def view(request):
-        workbook = fetch_excel_from_url(url)
-        if not workbook:
-            return JsonResponse({"error": "Failed to fetch Excel file"}, status=500)
-        data = parse_excel_data(workbook)
-        return JsonResponse(data, safe=False)
-    return view
+# # Step 4: Generate view
+# def generate_excel_view(url):
+#     def view(request):
+#         workbook = fetch_excel_from_url(url)
+#         if not workbook:
+#             return JsonResponse({"error": "Failed to fetch Excel file"}, status=500)
+#         data = parse_excel_data(workbook)
+#         return JsonResponse(data, safe=False)
+#     return view
 
 
 
-# Ticker api view 
-tickers_data_view = generate_excel_view(
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/Tickers/Valourwealth_Tickers.xlsx"
-)
+# # Ticker api view 
+# tickers_data_view = generate_excel_view(
+#     "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/Tickers/Valourwealth_Tickers.xlsx"
+# )
 
 
 
