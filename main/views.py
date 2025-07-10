@@ -1617,6 +1617,89 @@ weekly_small_caps_down_view = generate_intraday_view(
 
 # ==================================================================Today Ticker api view====================
 
+import openpyxl
+from django.http import JsonResponse
+from openpyxl import load_workbook
+from io import BytesIO
+import requests
+
+def fetch_excel_from_url(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return load_workbook(filename=BytesIO(response.content), data_only=True)
+    return None
+
+def format_ticker_excel_row(row):
+    try:
+        sentiment_raw = str(row.get("Sentiment", "")).replace("%", "").strip()
+        sentiment_value = float(sentiment_raw) if sentiment_raw.replace(".", "").isdigit() else None
+        sentiment_label = str(row.get("SentimentLabel", "")).lower()
+
+        # Classify sentiment type
+        if sentiment_label in ["bullish", "positive"]:
+            sentiment_type = "positive"
+        elif sentiment_label in ["bearish", "negative"]:
+            sentiment_type = "negative"
+        else:
+            sentiment_type = "neutral"
+
+        return {
+            "timeframe_label": str(row.get("Timeframe", "")).strip(),
+            "stock_symbol": str(row.get("Symbol", "")).strip(),
+            "company_name": str(row.get("Company", "")).strip(),
+            "stock_price": str(row.get("Price", "")).strip(),
+            "price_change": str(row.get("PriceChange", "")).strip(),
+            "sentiment_score": sentiment_value,
+            "sentiment_label": str(row.get("SentimentLabel", "")).strip(),
+            "sentiment_type": sentiment_type,
+            "news_sentiment_score": str(row.get("NewsSentiment", "")).strip(),
+            "contract_symbol": str(row.get("Contract", "")).strip(),
+            "contract_type": str(row.get("C/P", "")).strip(),  # Call/Put
+            "strike_price": str(row.get("Strike", "")).strip(),
+            "contract_price": str(row.get("Price", "")).strip(),
+            "expiry_date": str(row.get("Expiry", "")).strip(),
+            "trade_volume": str(row.get("Volume", "")).strip(),
+            "itm_percentage": str(row.get("ITM%", "")).strip()
+        }
+    except Exception as e:
+        print(f"❌ Error parsing row: {e}")
+        return {}
+
+def parse_excel_data(workbook):
+    sheet = workbook.active
+    headers = [cell.value for cell in next(sheet.iter_rows(min_row=1, max_row=1))]
+    results = []
+
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        row_data = dict(zip(headers, row))
+        if any(row_data.values()):
+            formatted = format_ticker_excel_row(row_data)
+            if formatted:
+                results.append(formatted)
+    return results
+
+def ticker_data_api(request):
+    timeframe = request.GET.get("timeframe", "1_Hour")
+
+    url = EXCEL_URLS.get(timeframe)
+    if not url:
+        return JsonResponse({"error": "Invalid timeframe. Use 1_Hour, 4_Hours, or 1_Day."}, status=400)
+
+    workbook = fetch_excel_from_url(url)
+    if not workbook:
+        return JsonResponse({"error": "Failed to fetch Excel file."}, status=500)
+
+    data = parse_excel_data(workbook)
+    return JsonResponse(data, safe=False)
+
+# ✅ Map timeframes to Cloudflare R2 files
+EXCEL_URLS = {
+    "1_Hour": "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/Tickers/Valourwealth_1_Hour.xlsx",
+    "4_Hours": "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/Tickers/Valourwealth_4_Hours.xlsx",
+    "1_Day": "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/Tickers/Valourwealth_1_Day.xlsx"
+}
+
+
 # import openpyxl
 # from django.http import JsonResponse
 # from openpyxl import load_workbook
