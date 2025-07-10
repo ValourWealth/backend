@@ -1345,34 +1345,41 @@ def generate_excel_view(url):
 
 xlsx_data_view_large_caps = generate_excel_view(
     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/ats/large_up.xlsx"
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/large_up.xlsx"
+    # "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/large_up.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/large_up.xlsx"
+    
     
 )
 
 xlsx_data_view_large_caps_down = generate_excel_view(    
     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/ats/large_down.xlsx"
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/large_down.xlsx"
+    # "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/large_down.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/large_down.xlsx"
 )
 
 xlsx_data_view_medium_caps = generate_excel_view(
     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/ats/medium_up.xlsx"
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/medium_up.xlsx"
+    # "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/medium_up.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/medium_up.xlsx"
 )
 
 xlsx_data_view_medium_caps_down = generate_excel_view(
     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/ats/medium_down.xlsx"
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/medium_down.xlsx"
+    # "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/medium_down.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/alerts_medium_down_data.xlsx"
 )
 
 xlsx_data_view_small_caps = generate_excel_view(
     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/ats/small_up.xlsx"
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/small_up.xlsx"
+    # "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/small_up.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/small_up.xlsx"
     
 )
 
 xlsx_data_view_small_caps_down = generate_excel_view(
     # "https://pub-e58a5f6126d0464c9b810e772987ba18.r2.dev/ats/small_down.xlsx"
-    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/small_down.xlsx"
+    # "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/ats/small_down.xlsx"
+    "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/small_down.xlsx"
 )
 
 
