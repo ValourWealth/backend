@@ -1764,12 +1764,6 @@ from openpyxl import load_workbook
 from io import BytesIO
 import requests
 
-# ✅ Map timeframes to Cloudflare R2 files
-EXCEL_URLS = {
-    "1_Hour": "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/Tickers/Valourwealth_1_Hour.xlsx",
-    "4_Hours": "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/Tickers/Valourwealth_4_Hours.xlsx",
-    "1_Day": "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/Tickers/Valourwealth_1_Day.xlsx"
-}
 
 
 def fetch_excel_from_url(url):
@@ -1845,6 +1839,13 @@ def ticker_data_api(request):
     return JsonResponse(data, safe=False)
 
 
+
+# ✅ Map timeframes to Cloudflare R2 files
+EXCEL_URLS = {
+    "1_Hour": "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/Tickers/Valourwealth_1_Hour.xlsx",
+    "4_Hours": "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/Tickers/Valourwealth_4_Hours.xlsx",
+    "1_Day": "https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/Tickers/Valourwealth_1_Day.xlsx"
+}
 
 
 

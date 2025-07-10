@@ -268,9 +268,9 @@ urlpatterns = [
 
     # for trade alerts
      # UpTrend APIs
-    path('api/alerts/large_caps/', alerts_xlsx_data_view_large_caps, name='alerts_xlsx_data_view_large_caps'),
-    path('api/alerts/medium_caps/', alerts_xlsx_data_view_medium_caps, name='alerts_xlsx_data_view_medium_caps'),
-    path('api/alerts/small_caps/', alerts_xlsx_data_view_small_caps, name='alerts_xlsx_data_view_small_caps'),
+    path('api/alerts/Large_caps/', alerts_xlsx_data_view_large_caps, name='alerts_xlsx_data_view_large_caps'),
+    path('api/alerts/Medium_caps/', alerts_xlsx_data_view_medium_caps, name='alerts_xlsx_data_view_medium_caps'),
+    path('api/alerts/Small_caps/', alerts_xlsx_data_view_small_caps, name='alerts_xlsx_data_view_small_caps'),
 
     # DownTrend APIs
     path('api/alerts/large_caps_down/', alerts_xlsx_data_view_large_caps_down, name='alerts_xlsx_data_view_large_caps_down'),
