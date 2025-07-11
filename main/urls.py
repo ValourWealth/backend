@@ -2,28 +2,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 from .views import (
-#     CourseListAPIView,
-#     EnrollCourseAPIView,
-#     CourseLevelsAPIView,
-#     LevelVideosAPIView,
-#     VideoDetailAPIView,
-#     CompleteVideoAPIView,
-#     QuizDetailAPIView,
-#     SubmitQuizAPIView,
-#     LevelExamDetailAPIView,
-#     SubmitExamAPIView,
-#     CourseDetailAPIView,
-#     LevelProgressAPIView,
-#    CourseVideosAPIView, 
-
-    # # stock_market_search_view,
-    # stock_market_news_view,
-    # technology_news_view,
-    # stock_news_view,
-    # recent_news_view,
-    # crypto_news_view,
-    # stock_data_view,
-    # For contact us 
     request_demo,
     contact_us,
     # for dark pool
@@ -51,69 +29,6 @@ from .views import UserProfileDetailView
 
 from rest_framework.routers import DefaultRouter
 from main.views import  *
-# (CourseViewSet, CourseLevelViewSet, VideoViewSet, mark_video_watched, get_course_progress, NoteViewSet, NotesByLevelAPIView,
-#                          MCQQuestionListAPIView, SubmitQuizAPIView,UserProfileDetailView, all_courses_progress,
-#                          WebinarListCreateView, WebinarRetrieveUpdateDestroyView, register_for_webinar, unregister_from_webinar,
-#                             MyConversationsView, SendMessageView, TradeJournalListCreateView,
-#                             user_list, FeatureRequestViewSet,
-
-#                             ChallengeViewSet, ChallengeParticipantViewSet,
-
-#                             # ChallengeListView,
-#                             # JoinChallengeView,
-#                             # UpdatePerformanceView,
-#                             # ChallengeLeaderboardView,
-#                             # MyChallengePerformanceView,
-#                             # OverallLeaderboardView,
-#                             NotificationListView,
-#                             MarkNotificationAsReadView,
-#                             unread_counts,
-#                             challenge_leaderboard,
-#                             # BeginnerHubCourseListView,
-#                             # BeginnerHubSectionListView,
-#                             # BeginnerHubVideoListView,
-#                             # save_beginnerhub_progress,
-#                             # get_beginnerhub_progress,
-#                             TradeGPTTokenView,
-#                             SalesContactView,
-#                             TrainingContactView,
-#                             weekly_large_caps_up_view, weekly_large_caps_down_view,
-#     weekly_medium_caps_up_view, weekly_medium_caps_down_view,
-#     weekly_small_caps_up_view, weekly_small_caps_down_view,
-#       intraday_large_caps_up_view,
-#     intraday_large_caps_down_view,
-#     intraday_medium_caps_up_view,
-#     intraday_medium_caps_down_view,
-#     intraday_small_caps_up_view,
-#     intraday_small_caps_down_view,
-  
-#     MarketNewsAPIView,
-#     PlatinumBriefingListAPIView,
-#     CoursesByCategory, CourseVideosView, VideoDetailView,
-#     create_mux_stream,
-#     MT5SnapshotUploadView,
-#     PortfolioSummaryView,
-#     SectorExposureView,
-#     AISuggestionsView,
-#     start_analyst_chat,
-#     AnalystChatDetailView,
-#     AnalystMessageCreateView,
-#     assigned_analyst,
-#     subscribe_newsletter,
-#     footer_subscribe,
-#     leave_review,
-#     request_call_credits,
-#     SectorIQView,
-#     DiversificationScoreView,
-#     EditorsChoiceListView,
-#     ensure_analyst_chat,
-    
-
-                            
-
-# )
-
-
 
 from .views import WebinarViewSet
 from rest_framework.routers import DefaultRouter
@@ -149,8 +64,7 @@ urlpatterns = [
 
     # user endpoints
     path('api/user/profile/', UserProfileDetailView.as_view(), name='user-profile-detail'),
-    # impersonate user login
-    path('api/admin/impersonate/', ImpersonateUserView.as_view(), name='impersonate-user'),
+    
 
     path("api/generate-tradegpt-token/", TradeGPTTokenView.as_view(), name="generate-tradegpt-token"),
     
