@@ -1,31 +1,26 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
-from .views import (
-    request_demo,
-    contact_us,
-    # for dark pool
-    xlsx_data_view_large_caps,
-    xlsx_data_view_medium_caps,
-    xlsx_data_view_small_caps,
-    xlsx_data_view_large_caps_down,
-    xlsx_data_view_medium_caps_down,
-    xlsx_data_view_small_caps_down,
-    alerts_xlsx_data_view_large_caps,
-    alerts_xlsx_data_view_large_caps_down,
-    alerts_xlsx_data_view_medium_caps,
-    alerts_xlsx_data_view_medium_caps_down,
-    alerts_xlsx_data_view_small_caps,
-    alerts_xlsx_data_view_small_caps_down,
-    TradeJournalListCreateView,
-     CallCreditViewSet, SessionViewSet,
-     
-    
+# from .views import (
+#     request_demo,
+#     contact_us,
+#     xlsx_data_view_large_caps,
+#     xlsx_data_view_medium_caps,
+#     xlsx_data_view_small_caps,
+#     xlsx_data_view_large_caps_down,
+#     xlsx_data_view_medium_caps_down,
+#     xlsx_data_view_small_caps_down,
+#     alerts_xlsx_data_view_large_caps,
+#     alerts_xlsx_data_view_large_caps_down,
+#     alerts_xlsx_data_view_medium_caps,
+#     alerts_xlsx_data_view_medium_caps_down,
+#     alerts_xlsx_data_view_small_caps,
+#     alerts_xlsx_data_view_small_caps_down,
+#     TradeJournalListCreateView,
+#     CallCreditViewSet, SessionViewSet,
+# )
 
-
-
-)
-from .views import UserProfileDetailView
+# from .views import UserProfileDetailView
 
 from rest_framework.routers import DefaultRouter
 from main.views import  *
