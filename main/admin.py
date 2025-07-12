@@ -457,11 +457,12 @@ class PlatformWalkthroughVideoAdmin(admin.ModelAdmin):
 
 
 # from django.contrib import admin
-# from .models import NFTBadge, UserNFTCollection, BadgeAssignmentRule
+from .models import NFTBadge
+# UserNFTCollection, BadgeAssignmentRule
 
-# @admin.register(NFTBadge)
-# class NFTBadgeAdmin(admin.ModelAdmin):
-#     list_display = ['name', 'category', 'manually_assignable']
+@admin.register(NFTBadge)
+class NFTBadgeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'category', 'manually_assignable']
 
 # @admin.register(UserNFTCollection)
 # class UserNFTCollectionAdmin(admin.ModelAdmin):
