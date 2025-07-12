@@ -228,7 +228,7 @@ class ChallengeSerializer(serializers.ModelSerializer):
         return obj.participants.count()  # ✅ use reverse relation for live count
 
 from .serializers import UserProfileSerializer  
-
+from .models import *
 class ChallengeParticipantSerializer(serializers.ModelSerializer):
     screenshot_url = serializers.SerializerMethodField()
     challenge = serializers.IntegerField(write_only=True)
@@ -253,6 +253,39 @@ class ChallengeParticipantSerializer(serializers.ModelSerializer):
             return UserProfileSerializer(profile).data
         except UserProfiles.DoesNotExist:
             return None
+
+# class NFTBadgeSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = NFTBadge
+#         fields = ['id', 'name', 'category', 'image', 'description']
+
+# class UserNFTCollectionSerializer(serializers.ModelSerializer):
+#     badge = NFTBadgeSerializer()
+#     class Meta:
+#         model = UserNFTCollection
+#         fields = ['badge', 'acquired_at']
+
+class NFTBadgeSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = NFTBadge
+        fields = ['id', 'name', 'category', 'image_url', 'description', 'manually_assignable']
+
+    def get_image_url(self, obj):
+        if obj.image:
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{obj.image.name}"
+        return None
+
+
+
+# ===============================================================================-
+
+
+
+
+
+
 
 
 class VideoSerializer(serializers.ModelSerializer):

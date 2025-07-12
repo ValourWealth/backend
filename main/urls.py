@@ -162,6 +162,9 @@ urlpatterns = [
     path("api/portfolio/diversification/", DiversificationScoreView.as_view()),
     
 
+    # NFT marketplace
+    path('api/nfts/', nft_marketplace_list),
+
 
 
     # UpTrend api

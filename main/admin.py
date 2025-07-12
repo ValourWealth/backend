@@ -453,3 +453,22 @@ from .models import PlatformWalkthroughVideo
 class PlatformWalkthroughVideoAdmin(admin.ModelAdmin):
     list_display = ("title", "author_name", "schedule_days", "schedule_time", "uploaded_at")
     search_fields = ("title", "description", "author_name")
+
+
+
+# from django.contrib import admin
+# from .models import NFTBadge, UserNFTCollection, BadgeAssignmentRule
+
+# @admin.register(NFTBadge)
+# class NFTBadgeAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'category', 'manually_assignable']
+
+# @admin.register(UserNFTCollection)
+# class UserNFTCollectionAdmin(admin.ModelAdmin):
+#     list_display = ['user', 'badge', 'acquired_at']
+
+# @admin.register(BadgeAssignmentRule)
+# class BadgeAssignmentRuleAdmin(admin.ModelAdmin):
+#     list_display = ['badge', 'trigger_type', 'trigger_value', 'active']
+
+

@@ -23,7 +23,7 @@ class User(AbstractUser):
 
 # user:::::=================
 # lan.M
-# Vwlogin1
+# Vwlogin@1
 
 # asdfing
 # qwerty1234
@@ -39,6 +39,9 @@ class User(AbstractUser):
 
 # valourwealth
 # FKRxteszZGXynV61
+
+
+
 # ===========================
 
 SUBSCRIPTION_CHOICES = [
@@ -538,6 +541,132 @@ class ChallengeParticipant(models.Model):
         if self.screenshots:
             return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{self.screenshots.name}"
         return None
+
+
+#  NFT badges marketplace
+
+class NFTBadge(models.Model):
+    CATEGORY_CHOICES = [
+        ('6month', '6 Month Anniversary'),
+        ('epic', 'Epic'),
+        ('rare', 'Rare'),
+        ('uncommon', 'Uncommon'),
+        ('legendary', 'Legendary'),
+        ('first', 'First Place'),
+        ('second', 'Second Place'),
+        ('third', 'Third Place'),
+        ('founder', 'Founder'),
+    ]
+    name = models.CharField(max_length=100)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    image = models.ImageField(upload_to='nfts/')
+    description = models.TextField(blank=True)
+    manually_assignable = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.name} ({self.category})"
+
+# Import User at top
+# from django.conf import settings
+# from django.db import models
+
+# User = settings.AUTH_USER_MODEL
+
+# class NFTBadge(models.Model):
+#     CATEGORY_CHOICES = [
+#         ('6month', '6 Month Anniversary'),
+#         ('epic', 'Epic'),
+#         ('rare', 'Rare'),
+#         ('uncommon', 'Uncommon'),
+#         ('legendary', 'Legendary'),
+#         ('first', 'First Place'),
+#         ('second', 'Second Place'),
+#         ('third', 'Third Place'),
+#         ('founder', 'Founder'),
+#     ]
+#     name = models.CharField(max_length=100)
+#     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, unique=True)
+#     image = models.ImageField(upload_to='nfts/')
+#     description = models.TextField(blank=True)
+#     manually_assignable = models.BooleanField(default=False)
+
+#     def __str__(self):
+#         return f"{self.name} ({self.category})"
+
+# class UserNFTCollection(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     badge = models.ForeignKey(NFTBadge, on_delete=models.CASCADE)
+#     acquired_at = models.DateTimeField(auto_now_add=True)
+
+#     class Meta:
+#         unique_together = ('user', 'badge')
+
+# class BadgeAssignmentRule(models.Model):
+#     BADGE_TRIGGER_CHOICES = [
+#         ('challenge_title', 'By Challenge Title'),
+#         ('challenge_rank_range', 'By Rank Range'),
+#         ('account_age', 'By Account Age'),
+#         ('login_streak', 'By Login Streak'),
+#         ('manual', 'Manual'),
+#         ('first_platinum', 'First X Platinum Members'),
+#     ]
+
+#     badge = models.ForeignKey(NFTBadge, on_delete=models.CASCADE)
+#     trigger_type = models.CharField(max_length=50, choices=BADGE_TRIGGER_CHOICES)
+#     trigger_value = models.CharField(max_length=255)
+#     extra_condition = models.TextField(blank=True, null=True)
+#     active = models.BooleanField(default=True)
+
+#     def __str__(self):
+#         return f"{self.badge.name} via {self.get_trigger_type_display()}"
+
+# from django.utils import timezone
+# from .models import NFTBadge, UserNFTCollection, BadgeAssignmentRule
+
+# def assign_badge(user, category):
+#     try:
+#         badge = NFTBadge.objects.get(category=category)
+#         UserNFTCollection.objects.get_or_create(user=user, badge=badge)
+#     except NFTBadge.DoesNotExist:
+#         pass
+
+# def assign_dynamic_badges(user, challenge=None, position=None):
+#     rules = BadgeAssignmentRule.objects.filter(active=True)
+
+#     for rule in rules:
+#         category = rule.badge.category
+
+#         # By Challenge Title
+#         if rule.trigger_type == "challenge_title" and challenge:
+#             if challenge.title.lower() == rule.trigger_value.lower():
+#                 assign_badge(user, category)
+
+#         # By Rank Range
+#         elif rule.trigger_type == "challenge_rank_range" and position:
+#             try:
+#                 start, end = map(int, rule.trigger_value.split("-"))
+#                 if start <= position <= end:
+#                     assign_badge(user, category)
+#             except:
+#                 continue
+
+#         # By Account Age
+#         elif rule.trigger_type == "account_age":
+#             try:
+#                 days_required = int(rule.trigger_value)
+#                 if (timezone.now() - user.created_at).days >= days_required:
+#                     assign_badge(user, category)
+#             except:
+#                 continue
+
+#         # Login streak or other rules handled elsewhere
+  
+
+    
+    
+    
+    
+    
 
 # Landing page Blogs
 from django.db import models
