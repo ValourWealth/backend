@@ -288,8 +288,8 @@ admin.site.register(Vote)
 admin.site.register(FeatureRequest)
 # admin.site.register(Portfolio)
 # admin.site.register(PortfolioAsset)
-admin.site.register(Challenge)
-admin.site.register(ChallengeParticipant)
+# admin.site.register(Challenge)
+# admin.site.register(ChallengeParticipant)
 
 
 # =================================================================================================================================================
@@ -456,13 +456,43 @@ class PlatformWalkthroughVideoAdmin(admin.ModelAdmin):
 
 
 
-# from django.contrib import admin
+
+# ========================================================================================================================================
+# ========================================================================================================================================
+# ========================================================================================================================================
+# ========================================================================================================================================
+# ========================================================================================================================================
+# ========================================================================================================================================
 from .models import NFTBadge
-# UserNFTCollection, BadgeAssignmentRule
+from django.contrib import admin
+from .models import NFTBadge, Challenge, ChallengeParticipant
+
 
 @admin.register(NFTBadge)
 class NFTBadgeAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'manually_assignable']
+    list_display = ['name', 'category', 'linked_user', 'linked_challenge', 'manually_assignable', 'assigned_at']
+    list_filter = ['category', 'manually_assignable']
+    search_fields = ['name', 'linked_user__username']
+
+
+@admin.register(Challenge)
+class ChallengeAdmin(admin.ModelAdmin):
+    list_display = ['title', 'start_date', 'end_date', 'participants_count']
+    search_fields = ['title']
+    list_filter = ['start_date', 'end_date']
+
+
+@admin.register(ChallengeParticipant)
+class ChallengeParticipantAdmin(admin.ModelAdmin):
+    list_display = ['user', 'challenge', 'leaderboard_position', 'created_at']
+    search_fields = ['user__username', 'challenge__title']
+    list_filter = ['challenge']
+
+
+
+# @admin.register(NFTBadge)
+# class NFTBadgeAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'category', 'manually_assignable']
 
 # @admin.register(UserNFTCollection)
 # class UserNFTCollectionAdmin(admin.ModelAdmin):
