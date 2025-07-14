@@ -544,7 +544,6 @@ class ChallengeParticipant(models.Model):
 
 
 #  NFT badges marketplace
-
 class NFTBadge(models.Model):
     CATEGORY_CHOICES = [
         ('6month', '6 Month Anniversary'),
@@ -559,12 +558,21 @@ class NFTBadge(models.Model):
     ]
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
-    image = models.ImageField(upload_to='nfts/')
+    
+    # ✅ Set image storage to R2
+    image = models.ImageField(upload_to='nfts/', storage=R2Storage())
+
     description = models.TextField(blank=True)
     manually_assignable = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name} ({self.category})"
+
+    @property
+    def image_public_url(self):
+        if self.image:
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{self.image.name}"
+        return None
 
 # Import User at top
 # from django.conf import settings
