@@ -558,12 +558,14 @@ class NFTBadge(models.Model):
     ]
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
-    
-    # ✅ Set image storage to R2
     image = models.ImageField(upload_to='nfts/', storage=R2Storage())
-
     description = models.TextField(blank=True)
     manually_assignable = models.BooleanField(default=False)
+    
+    linked_user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    linked_challenge = models.ForeignKey('Challenge', null=True, blank=True, on_delete=models.SET_NULL)
+    assigned_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return f"{self.name} ({self.category})"

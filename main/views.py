@@ -821,7 +821,106 @@ def nft_marketplace_list(request):
     serializer = NFTBadgeSerializer(badges, many=True)
     return Response(serializer.data)
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from django.utils import timezone
+from django.db.models import Count
+from datetime import timedelta
+import random
 
+from .models import NFTBadge, Challenge, ChallengeParticipant
+from .models import User  # adjust if needed
+from .models import LoginActivity  # for uncommon login count, adjust model name if needed
+
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def assign_all_badges_view(request):
+    results = []
+
+    # -------------------- Epic --------------------
+    epic_challenge = Challenge.objects.filter(title__icontains="epic").last()
+    if epic_challenge:
+        p = ChallengeParticipant.objects.filter(
+            challenge=epic_challenge,
+            leaderboard_position__in=[5, 6, 7]
+        ).order_by('leaderboard_position')
+        if p.exists():
+            winner = random.choice(list(p))
+            badge = NFTBadge.objects.filter(category='epic', linked_user__isnull=True).first()
+            if badge:
+                badge.linked_user = winner.user
+                badge.linked_challenge = epic_challenge
+                badge.save()
+                results.append(f"Epic badge assigned to {winner.user.username}")
+
+    # -------------------- First/Second/Third --------------------
+    def assign_ranked_badge(rank, category):
+        part = ChallengeParticipant.objects.filter(
+            challenge=epic_challenge,
+            leaderboard_position=rank
+        ).first()
+        if part:
+            badge = NFTBadge.objects.filter(category=category, linked_user__isnull=True).first()
+            if badge:
+                badge.linked_user = part.user
+                badge.linked_challenge = epic_challenge
+                badge.save()
+                results.append(f"{category.title()} badge assigned to {part.user.username}")
+
+    assign_ranked_badge(1, 'first')
+    assign_ranked_badge(2, 'second')
+    assign_ranked_badge(3, 'third')
+
+    # -------------------- Legendary (Global Rank 1) --------------------
+    top_participant = ChallengeParticipant.objects.filter(
+        leaderboard_position=1
+    ).order_by('created_at').first()
+    if top_participant:
+        badge = NFTBadge.objects.filter(category='legendary', linked_user__isnull=True).first()
+        if badge:
+            badge.linked_user = top_participant.user
+            badge.linked_challenge = top_participant.challenge
+            badge.save()
+            results.append(f"Legendary badge assigned to {top_participant.user.username}")
+
+    # -------------------- 6 Month --------------------
+    six_months_ago = timezone.now() - timedelta(days=180)
+    eligible_users = User.objects.filter(date_joined__lte=six_months_ago)
+
+    for user in eligible_users:
+        badge = NFTBadge.objects.filter(category='6month', linked_user__isnull=True).first()
+        if badge:
+            badge.linked_user = user
+            badge.save()
+            results.append(f"6month badge assigned to {user.username}")
+
+    # -------------------- Uncommon (Most logins this week) --------------------
+    week_ago = timezone.now() - timedelta(days=7)
+    login_counts = LoginActivity.objects.filter(
+        timestamp__gte=week_ago
+    ).values('user').annotate(total=Count('id')).order_by('-total')
+
+    if login_counts:
+        top_user_id = login_counts[0]['user']
+        top_user = User.objects.get(id=top_user_id)
+        badge = NFTBadge.objects.filter(category='uncommon', linked_user__isnull=True).first()
+        if badge:
+            badge.linked_user = top_user
+            badge.save()
+            results.append(f"Uncommon badge assigned to {top_user.username}")
+
+    # -------------------- Founder (Oldest platinum user) --------------------
+    oldest_platinum = User.objects.filter(plan='platinum').order_by('date_joined').first()
+    if oldest_platinum:
+        badge = NFTBadge.objects.filter(category='founder', linked_user__isnull=True).first()
+        if badge:
+            badge.linked_user = oldest_platinum
+            badge.save()
+            results.append(f"Founder badge assigned to {oldest_platinum.username}")
+
+    return Response({"results": results})
 
 
 

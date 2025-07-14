@@ -254,16 +254,6 @@ class ChallengeParticipantSerializer(serializers.ModelSerializer):
         except UserProfiles.DoesNotExist:
             return None
 
-# class NFTBadgeSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = NFTBadge
-#         fields = ['id', 'name', 'category', 'image', 'description']
-
-# class UserNFTCollectionSerializer(serializers.ModelSerializer):
-#     badge = NFTBadgeSerializer()
-#     class Meta:
-#         model = UserNFTCollection
-#         fields = ['badge', 'acquired_at']
 
 
 class NFTBadgeSerializer(serializers.ModelSerializer):
@@ -271,7 +261,8 @@ class NFTBadgeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = NFTBadge
-        fields = ['id', 'name', 'category', 'image_url', 'description', 'manually_assignable']
+        fields = ['id', 'name', 'category', 'image_url', 'description', 'manually_assignable',
+                  'linked_user', 'linked_challenge', 'assigned_at']
 
     def get_image_url(self, obj):
         return obj.image_public_url
