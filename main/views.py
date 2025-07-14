@@ -762,26 +762,6 @@ class ChallengeParticipantViewSet(viewsets.ModelViewSet):
         if ChallengeParticipant.objects.filter(user=self.request.user, challenge=challenge).exists():
             raise serializers.ValidationError({"detail": "Already submitted."})
         serializer.save(user=self.request.user, challenge=challenge)
-        
-        # # ✅ Dynamic badge based on challenge title
-        # assign_dynamic_badges(user=self.request.user, challenge=challenge)
-
-
-# @api_view(['GET'])
-# def challenge_leaderboard(request, pk):
-#     challenge = get_object_or_404(Challenge, pk=pk)
-
-#     participants = ChallengeParticipant.objects.filter(
-#         challenge=challenge
-#     ).exclude(leaderboard_position=None).order_by('leaderboard_position', 'created_at')
-
-#     # ✅ Assign dynamic badges based on rank
-#     for p in participants:
-#         assign_dynamic_badges(user=p.user, challenge=challenge, position=p.leaderboard_position)
-
-#     serializer = ChallengeParticipantSerializer(participants, many=True)
-#     return Response(serializer.data)
-
 
 
 @api_view(['GET'])
@@ -837,7 +817,6 @@ from .models import User  # adjust if needed
 from .models import LoginActivity  # for uncommon login count, adjust model name if needed
 
 @csrf_exempt
-@api_view(['POST'])
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def assign_all_badges_view(request):
