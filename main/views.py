@@ -828,12 +828,16 @@ from django.utils import timezone
 from django.db.models import Count
 from datetime import timedelta
 import random
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
 
 from .models import NFTBadge, Challenge, ChallengeParticipant
 from .models import User  # adjust if needed
 from .models import LoginActivity  # for uncommon login count, adjust model name if needed
 
-
+@csrf_exempt
+@api_view(['POST'])
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def assign_all_badges_view(request):
