@@ -164,7 +164,7 @@ urlpatterns = [
 
     # NFT marketplace
     path('api/nfts/', nft_marketplace_list),
-    path("assign-all-badges/", assign_all_badges_view),
+    path("api/assign-all-badges/", assign_all_badges_view),
 
 
     # UpTrend api

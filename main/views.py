@@ -895,13 +895,16 @@ def assign_all_badges_view(request):
             results.append(f"Uncommon badge assigned to {top_user.username}")
 
     # -------------------- Founder (Oldest platinum user) --------------------
-    oldest_platinum = User.objects.filter(plan='platinum').order_by('date_joined').first()
-    if oldest_platinum:
+    # oldest_platinum = User.objects.filter(plan='platinum').order_by('date_joined').first()
+    from .models import UserProfiles
+    oldest_platinum_profile = UserProfiles.objects.filter(subscription_status='platinum').order_by('user__date_joined').first()
+    if oldest_platinum_profile:
         badge = NFTBadge.objects.filter(category='founder', linked_user__isnull=True).first()
         if badge:
-            badge.linked_user = oldest_platinum
+            badge.linked_user = oldest_platinum_profile.user
             badge.save()
-            results.append(f"Founder badge assigned to {oldest_platinum.username}")
+            results.append(f"Founder badge assigned to {oldest_platinum_profile.user.username}")
+
 
     return Response({"results": results})
 
