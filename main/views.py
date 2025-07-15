@@ -783,6 +783,42 @@ def challenge_leaderboard(request, pk):
     return Response(serializer.data)
 
 
+# Overall challanges leaderboard
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def overall_leaderboard(request):
+    user_scores = defaultdict(int)
+
+    participants = ChallengeParticipant.objects.exclude(leaderboard_position=None)
+
+    for p in participants:
+        score = max(0, 100 - p.leaderboard_position)
+        user_scores[p.user_id] += score
+
+    sorted_users = sorted(user_scores.items(), key=lambda x: x[1], reverse=True)
+
+    result = []
+    for rank, (user_id, score) in enumerate(sorted_users, start=1):
+        try:
+            user = User.objects.get(id=user_id)
+            profile = user.profile
+            profile_data = UserProfileSerializer(profile).data
+        except Exception:
+            profile_data = None
+
+        result.append({
+            "rank": rank,
+            "user_id": user_id,
+            "username": user.username,
+            "total_score": score,
+            "profile": profile_data
+        })
+
+    return Response(result)
+
+
+
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny

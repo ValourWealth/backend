@@ -111,6 +111,12 @@ urlpatterns = [
     # Challenge Routes
     path('api/', include(challengerouter.urls)),
     path('api/challenges/<int:pk>/leaderboard/', challenge_leaderboard),
+    path('api/overall-leaderboard/', overall_leaderboard),
+    
+    # NFT marketplace
+    path('api/nfts/', nft_marketplace_list),
+    path("api/assign-all-badges/", assign_all_badges_view),
+
 
     #For notification platinum member
     path('api/notifications/', NotificationListView.as_view(), name='notifications'),
@@ -161,10 +167,6 @@ urlpatterns = [
     path("api/portfolio/sector-iq/", SectorIQView.as_view()),
     path("api/portfolio/diversification/", DiversificationScoreView.as_view()),
     
-
-    # NFT marketplace
-    path('api/nfts/', nft_marketplace_list),
-    path("api/assign-all-badges/", assign_all_badges_view),
 
 
     # UpTrend api
