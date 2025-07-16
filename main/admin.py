@@ -1,5 +1,6 @@
 # admin.py
 from django.contrib import admin
+from . models import *
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import User, UserProfiles, CourseEnrollment, ChallengeParticipant, Challenge, MT5Snapshot, SectorExposure
 class UserAdmin(BaseUserAdmin):
@@ -503,3 +504,7 @@ class ChallengeParticipantAdmin(admin.ModelAdmin):
 #     list_display = ['badge', 'trigger_type', 'trigger_value', 'active']
 
 
+
+
+admin.site.register(ChatThread)
+admin.site.register(Message)

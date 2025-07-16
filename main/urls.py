@@ -103,6 +103,12 @@ urlpatterns = [
     path('api/analyst-messages/', AnalystMessageListView.as_view(), name='analyst-messages'),
 
 
+    path("api/chat/inbox/", InboxList.as_view(), name="chat-inbox"),
+    path("api/chat/thread/<int:thread_id>/", MessageList.as_view(), name="chat-thread-messages"),
+    path("api/chat/thread/<int:thread_id>/send/", VSendMessageView.as_view(), name="chat-send-message"),
+    path("api/chat/thread/create/", GetOrCreateThread.as_view(), name="chat-create-thread"),
+
+
     # for session call
     path('api/', include(routersch.urls)),
     path('api/', include(featurerouter.urls)),

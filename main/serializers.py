@@ -82,6 +82,35 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+from rest_framework import serializers
+from .models import ChatThread, Message
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class UserMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
+
+class ChatThreadSerializer(serializers.ModelSerializer):
+    user = UserMiniSerializer()
+    analyst = UserMiniSerializer()
+
+    class Meta:
+        model = ChatThread
+        fields = "__all__"
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = UserMiniSerializer()
+
+    class Meta:
+        model = Message
+        fields = "__all__"
+
+
+
+
 # =====================================================================================================================================
 from rest_framework import serializers
 from .models import PlatformWalkthroughVideo
