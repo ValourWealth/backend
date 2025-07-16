@@ -63,6 +63,76 @@ class UserProfileDetailView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from .models import ChatThread, Message
+from .serializers import ChatThreadSerializer, MessageSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class InboxList(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.profile.role == 'analyst':
+            threads = ChatThread.objects.all()
+        else:
+            threads = ChatThread.objects.filter(user=request.user)
+        return Response(ChatThreadSerializer(threads, many=True).data)
+
+class MessageList(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, thread_id):
+        thread = get_object_or_404(ChatThread, id=thread_id)
+        if request.user != thread.user and request.user != thread.analyst:
+            return Response({"detail": "Not allowed."}, status=403)
+        messages = Message.objects.filter(thread=thread).order_by('timestamp')
+        return Response(MessageSerializer(messages, many=True).data)
+
+class VSendMessageView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, thread_id):
+        thread = get_object_or_404(ChatThread, id=thread_id)
+        content = request.data.get("content")
+
+        if not content:
+            return Response({"error": "Message content required."}, status=400)
+
+        if request.user != thread.user and request.user != thread.analyst:
+            return Response({"error": "Not authorized."}, status=403)
+
+        message = Message.objects.create(
+            thread=thread,
+            sender=request.user,
+            content=content
+        )
+        return Response(MessageSerializer(message).data, status=201)
+
+class GetOrCreateThread(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        other_user_id = request.data.get("user_id")
+        if not other_user_id:
+            return Response({"error": "user_id required"}, status=400)
+
+        other_user = get_object_or_404(User, id=other_user_id)
+
+        if request.user.profile.role == 'analyst':
+            thread, _ = ChatThread.objects.get_or_create(user=other_user, analyst=request.user)
+        else:
+            thread, _ = ChatThread.objects.get_or_create(user=request.user, analyst=other_user)
+
+        return Response(ChatThreadSerializer(thread).data)
+
+
+
 # ********************************************************************************************************************************************************************************
 # ********************************************************************************************************************************************************************************
 # ===================================================================================================================================================
