@@ -58,7 +58,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from .models import ChatThread, Message
+from .models import ChatThread, Ana_Message
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -125,4 +125,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def create_message(self, thread, sender, content):
-        return Message.objects.create(thread=thread, sender=sender, content=content)
+        return Ana_Message.objects.create(thread=thread, sender=sender, content=content)

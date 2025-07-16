@@ -507,4 +507,4 @@ class ChallengeParticipantAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ChatThread)
-admin.site.register(Message)
+admin.site.register(Ana_Message)

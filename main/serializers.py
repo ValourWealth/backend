@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Course, CourseLevel, Video, Note, User, MCQQuestion, UserProfiles, CourseEnrollment
 from django.contrib.auth import get_user_model
 from django.urls import path
+from .models import *
 from rest_framework import serializers, generics, permissions
 from .models import TradeJournalEntry
 
@@ -105,7 +106,7 @@ class MessageSerializer(serializers.ModelSerializer):
     sender = UserMiniSerializer()
 
     class Meta:
-        model = Message
+        model = Ana_Message
         fields = "__all__"
 
 
