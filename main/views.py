@@ -91,7 +91,7 @@ class MessageList(APIView):
         thread = get_object_or_404(ChatThread, id=thread_id)
         if request.user != thread.user and request.user != thread.analyst:
             return Response({"detail": "Not allowed."}, status=403)
-        messages = Message.objects.filter(thread=thread).order_by('timestamp')
+        messages = Ana_Message.objects.filter(thread=thread).order_by('timestamp')
         return Response(MessageSerializer(messages, many=True).data)
 
 class VSendMessageView(APIView):
@@ -107,7 +107,7 @@ class VSendMessageView(APIView):
         if request.user != thread.user and request.user != thread.analyst:
             return Response({"error": "Not authorized."}, status=403)
 
-        message = Message.objects.create(
+        message = Ana_Message.objects.create(
             thread=thread,
             sender=request.user,
             content=content

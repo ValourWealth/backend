@@ -124,7 +124,7 @@ class ChatThread(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.analyst.username if self.analyst else 'Unassigned'}"
 
-class Message(models.Model):
+class Ana_Message(models.Model):
     thread = models.ForeignKey(ChatThread, related_name="messages", on_delete=models.CASCADE)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
