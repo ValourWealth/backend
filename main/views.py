@@ -899,6 +899,24 @@ def my_recent_badges(request):
 
 
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import NFTBadge
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def collect_badge(request, badge_id):
+    try:
+        badge = NFTBadge.objects.get(id=badge_id, linked_user__isnull=True)
+    except NFTBadge.DoesNotExist:
+        return Response({"error": "Badge already collected or invalid"}, status=400)
+
+    badge.linked_user = request.user
+    badge.save()
+    return Response({"success": True, "message": "Badge collected successfully!"})
+
+
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .models import NFTBadge
