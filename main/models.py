@@ -8,11 +8,7 @@ from django.conf import settings
 from VWBE.storage_backends import R2Storage
 from django.db import models
 from django.conf import settings
-from .models import NFTBadge
-
-
-
-
+# from .models import NFTBadge
 
 class User(AbstractUser):
     # Fields inherited: id, username, first_name, last_name, email, password, etc.
@@ -20,6 +16,44 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+#  NFT badges marketplace
+class NFTBadge(models.Model):
+    CATEGORY_CHOICES = [
+        ('6month', '6 Month Anniversary'),
+        ('epic', 'Epic'),
+        ('rare', 'Rare'),
+        ('uncommon', 'Uncommon'),
+        ('legendary', 'Legendary'),
+        ('first', 'First Place'),
+        ('second', 'Second Place'),
+        ('third', 'Third Place'),
+        ('founder', 'Founder'),
+    ]
+    name = models.CharField(max_length=100)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    image = models.ImageField(upload_to='nfts/', storage=R2Storage())
+    description = models.TextField(blank=True)
+    manually_assignable = models.BooleanField(default=False)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="collected_nfts")
+    linked_user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    linked_challenge = models.ForeignKey('Challenge', null=True, blank=True, on_delete=models.SET_NULL)
+    assigned_at = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return f"{self.name} ({self.category})"
+
+    @property
+    def image_public_url(self):
+        if self.image:
+            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{self.image.name}"
+        return None
+
+
+
+
 # =========================================================================================================
 
 # user:::::=================
@@ -787,38 +821,6 @@ class ChallengeParticipant(models.Model):
         return None
 
 
-#  NFT badges marketplace
-class NFTBadge(models.Model):
-    CATEGORY_CHOICES = [
-        ('6month', '6 Month Anniversary'),
-        ('epic', 'Epic'),
-        ('rare', 'Rare'),
-        ('uncommon', 'Uncommon'),
-        ('legendary', 'Legendary'),
-        ('first', 'First Place'),
-        ('second', 'Second Place'),
-        ('third', 'Third Place'),
-        ('founder', 'Founder'),
-    ]
-    name = models.CharField(max_length=100)
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
-    image = models.ImageField(upload_to='nfts/', storage=R2Storage())
-    description = models.TextField(blank=True)
-    manually_assignable = models.BooleanField(default=False)
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="collected_nfts")
-    linked_user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
-    linked_challenge = models.ForeignKey('Challenge', null=True, blank=True, on_delete=models.SET_NULL)
-    assigned_at = models.DateTimeField(auto_now_add=True)
-
-
-    def __str__(self):
-        return f"{self.name} ({self.category})"
-
-    @property
-    def image_public_url(self):
-        if self.image:
-            return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{self.image.name}"
-        return None
 
 # ***************************************************************************************************************** 
 # ***************************************************************************************************************** 
