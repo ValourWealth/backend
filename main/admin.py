@@ -486,6 +486,7 @@ class ChallengeAdmin(admin.ModelAdmin):
 @admin.register(ChallengeParticipant)
 class ChallengeParticipantAdmin(admin.ModelAdmin):
     list_display = ['user', 'challenge', 'leaderboard_position', 'created_at']
+    list_editable = ['leaderboard_position']  # ✅ inline edit
     search_fields = ['user__username', 'challenge__title']
     list_filter = ['challenge']
 

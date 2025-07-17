@@ -227,35 +227,102 @@ from rest_framework import serializers
 from .models import Challenge, ChallengeParticipant
 from rest_framework import serializers
 from .models import Challenge, ChallengeParticipant
+# class ChallengeSerializer(serializers.ModelSerializer):
+#     is_joined = serializers.SerializerMethodField()
+#     participant_id = serializers.SerializerMethodField()
+#     participants_count = serializers.SerializerMethodField()  # ✅ added dynamic field
+
+#     class Meta:
+#         model = Challenge
+#         fields = '__all__'  # Includes is_joined, participant_id, participants_count
+
+#     def get_is_joined(self, obj):
+#         request = self.context.get("request")
+#         user = request.user if request else None
+#         if not user or user.is_anonymous:
+#             return False
+#         return ChallengeParticipant.objects.filter(user=user, challenge=obj).exists()
+
+#     def get_participant_id(self, obj):
+#         request = self.context.get("request")
+#         user = request.user if request else None
+#         if not user or user.is_anonymous:
+#             return None
+#         try:
+#             participant = ChallengeParticipant.objects.get(user=user, challenge=obj)
+#             return participant.id
+#         except ChallengeParticipant.DoesNotExist:
+#             return None
+
+#     def get_participants_count(self, obj):
+#         return obj.participants.count()  # ✅ use reverse relation for live count
+
 class ChallengeSerializer(serializers.ModelSerializer):
     is_joined = serializers.SerializerMethodField()
     participant_id = serializers.SerializerMethodField()
-    participants_count = serializers.SerializerMethodField()  # ✅ added dynamic field
+    participants_count = serializers.SerializerMethodField()
+    nft_rewards = serializers.SerializerMethodField()
+    user_position = serializers.SerializerMethodField()  # ✅ NEW
 
     class Meta:
         model = Challenge
-        fields = '__all__'  # Includes is_joined, participant_id, participants_count
+        fields = '__all__'  # includes all above
 
     def get_is_joined(self, obj):
-        request = self.context.get("request")
-        user = request.user if request else None
-        if not user or user.is_anonymous:
-            return False
+        user = self.context['request'].user
         return ChallengeParticipant.objects.filter(user=user, challenge=obj).exists()
 
     def get_participant_id(self, obj):
-        request = self.context.get("request")
-        user = request.user if request else None
-        if not user or user.is_anonymous:
-            return None
+        user = self.context['request'].user
         try:
-            participant = ChallengeParticipant.objects.get(user=user, challenge=obj)
-            return participant.id
+            return ChallengeParticipant.objects.get(user=user, challenge=obj).id
         except ChallengeParticipant.DoesNotExist:
             return None
 
     def get_participants_count(self, obj):
-        return obj.participants.count()  # ✅ use reverse relation for live count
+        return obj.participants.count()
+
+    def get_user_position(self, obj):
+        user = self.context['request'].user
+        try:
+            part = ChallengeParticipant.objects.get(user=user, challenge=obj)
+            return part.leaderboard_position
+        except ChallengeParticipant.DoesNotExist:
+            return None
+
+    def get_nft_rewards(self, obj):
+        user = self.context['request'].user
+        badges = NFTBadge.objects.filter(linked_challenge=obj)
+        result = []
+
+        category_position_map = {
+            'first': 1,
+            'second': 2,
+            'third': 3,
+            'fourth': 4,
+            'fifth': 5,
+            'six': 6,
+            'seven': 7,
+            'eight': 8,
+            'nin': 9,
+            'ten': 10,
+        }
+
+        for badge in badges:
+            category = badge.category
+            required_position = category_position_map.get(category, None)
+
+            result.append({
+                "id": badge.id,
+                "name": badge.name,
+                "category": category,
+                "description": badge.description,
+                "image_url": badge.image_public_url,
+                "position_required": required_position,
+                "unlocked": badge.linked_user == user
+            })
+
+        return result
 
 from .serializers import UserProfileSerializer  
 from .models import *
@@ -264,12 +331,14 @@ class ChallengeParticipantSerializer(serializers.ModelSerializer):
     challenge = serializers.IntegerField(write_only=True)
     user_profile = serializers.SerializerMethodField()
     leaderboard_position = serializers.IntegerField(read_only=True)
+    unlocked_badge = serializers.SerializerMethodField()  # ✅ NEW
 
     class Meta:
         model = ChallengeParticipant
         fields = [
             'id', 'user', 'challenge', 'answers', 'screenshots',
-            'screenshot_url', 'leaderboard_position', 'created_at', 'user_profile'
+            'screenshot_url', 'leaderboard_position', 'created_at', 'user_profile',
+             'unlocked_badge'
         ]
         read_only_fields = ['user']
 
@@ -283,7 +352,16 @@ class ChallengeParticipantSerializer(serializers.ModelSerializer):
             return UserProfileSerializer(profile).data
         except UserProfiles.DoesNotExist:
             return None
-
+    def get_unlocked_badge(self, obj):
+        badge = NFTBadge.objects.filter(linked_user=obj.user, linked_challenge=obj.challenge).first()
+        if badge:
+            return {
+                "id": badge.id,
+                "name": badge.name,
+                "category": badge.category,
+                "image_url": badge.image_public_url
+            }
+        return None
 
 
 class NFTBadgeSerializer(serializers.ModelSerializer):
