@@ -36,7 +36,7 @@ class NFTBadge(models.Model):
     image = models.ImageField(upload_to='nfts/', storage=R2Storage())
     description = models.TextField(blank=True)
     manually_assignable = models.BooleanField(default=False)
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="collected_nfts")
+    
     linked_user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     linked_challenge = models.ForeignKey('Challenge', null=True, blank=True, on_delete=models.SET_NULL)
     assigned_at = models.DateTimeField(auto_now_add=True)

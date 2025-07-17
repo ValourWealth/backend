@@ -41,6 +41,7 @@ class NFTBadgeSerializer(serializers.ModelSerializer):
         return obj.image_public_url
 
 
+
 class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', required=False)
     first_name = serializers.CharField(source='user.first_name', required=False)
@@ -377,16 +378,16 @@ class ChallengeParticipantSerializer(serializers.ModelSerializer):
         return None
 
 
-class NFTBadgeSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField()
+# class NFTBadgeSerializer(serializers.ModelSerializer):
+#     image_url = serializers.SerializerMethodField()
 
-    class Meta:
-        model = NFTBadge
-        fields = ['id', 'name', 'category', 'image_url', 'description', 'manually_assignable',
-                  'linked_user', 'linked_challenge', 'assigned_at']
+#     class Meta:
+#         model = NFTBadge
+#         fields = ['id', 'name', 'category', 'image_url', 'description', 'manually_assignable',
+#                   'linked_user', 'linked_challenge', 'assigned_at']
 
-    def get_image_url(self, obj):
-        return obj.image_public_url
+#     def get_image_url(self, obj):
+#         return obj.image_public_url
 
 
 # ===============================================================================-
