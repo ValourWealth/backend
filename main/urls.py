@@ -122,6 +122,8 @@ urlpatterns = [
     # NFT marketplace
     path('api/nfts/', nft_marketplace_list),
     path("api/assign-all-badges/", assign_all_badges_view),
+    path("api/my-recent-badges/", my_recent_badges),
+
 
 
     #For notification platinum member

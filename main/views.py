@@ -886,6 +886,17 @@ def overall_leaderboard(request):
 
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_recent_badges(request):
+    user = request.user
+    recent_badges = NFTBadge.objects.filter(
+        linked_user=user
+    ).order_by('-assigned_at')[:5]
+
+    serializer = NFTBadgeSerializer(recent_badges, many=True)
+    return Response(serializer.data)
+
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
