@@ -8,6 +8,7 @@ from django.conf import settings
 from VWBE.storage_backends import R2Storage
 from django.db import models
 from django.conf import settings
+from main.models import NFTBadge
 
 
 
@@ -68,6 +69,13 @@ class UserProfiles(models.Model):
         storage=R2Storage(),  # upload to R2
         blank=True,
         null=True
+    )
+    primary_badge = models.ForeignKey(
+        NFTBadge,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="primary_badge_users"
     )
     subscription_status = models.CharField(max_length=20, choices=SUBSCRIPTION_CHOICES, default='free')
     country = CountryField(blank=True, null=True)
@@ -797,7 +805,7 @@ class NFTBadge(models.Model):
     image = models.ImageField(upload_to='nfts/', storage=R2Storage())
     description = models.TextField(blank=True)
     manually_assignable = models.BooleanField(default=False)
-    
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="collected_nfts")
     linked_user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     linked_challenge = models.ForeignKey('Challenge', null=True, blank=True, on_delete=models.SET_NULL)
     assigned_at = models.DateTimeField(auto_now_add=True)
@@ -811,6 +819,7 @@ class NFTBadge(models.Model):
         if self.image:
             return f"https://pub-552c13ad8f084b0ca3d7b5aa8ddb03a7.r2.dev/{self.image.name}"
         return None
+
 # ***************************************************************************************************************** 
 # ***************************************************************************************************************** 
 # ***************************************************************************************************************** 

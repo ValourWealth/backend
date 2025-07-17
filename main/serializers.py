@@ -5,7 +5,7 @@ from django.urls import path
 from .models import *
 from rest_framework import serializers, generics, permissions
 from .models import TradeJournalEntry
-
+from main.serializers import NFTBadgeSerializer
 User = get_user_model()
 
 
@@ -41,6 +41,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     is_superuser = serializers.BooleanField(source='user.is_superuser', read_only=True)
     profile_photo = serializers.ImageField(required=False)
     profile_photo_url = serializers.SerializerMethodField()
+    primary_badge = NFTBadgeSerializer(read_only=True)
     role = serializers.ChoiceField(choices=UserProfiles.USER_ROLES, required=False)  # Add the role field
 
     class Meta:
@@ -60,6 +61,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'subscription_status',
             'is_staff',
             'is_superuser',
+             'primary_badge',
             'role',  # Include role in the serializer  
         ]
 

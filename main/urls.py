@@ -124,6 +124,8 @@ urlpatterns = [
     path("api/assign-all-badges/", assign_all_badges_view),
     path("api/my-recent-badges/", my_recent_badges),
     path('api/collect-badge/<int:badge_id>/', collect_badge),
+    path("api/set-primary-badge/", set_primary_badge),
+
 
 
 

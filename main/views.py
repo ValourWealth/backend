@@ -885,6 +885,25 @@ def overall_leaderboard(request):
     return Response(result)
 
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import NFTBadge
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def set_primary_badge(request):
+    badge_id = request.data.get("badge_id")
+    try:
+        badge = NFTBadge.objects.get(id=badge_id)
+        if badge not in request.user.collected_nfts.all():
+            return Response({"error": "Badge not owned"}, status=403)
+        request.user.profile.primary_badge = badge
+        request.user.profile.save()
+        return Response({"success": "Primary badge updated"})
+    except NFTBadge.DoesNotExist:
+        return Response({"error": "Badge not found"}, status=404)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
