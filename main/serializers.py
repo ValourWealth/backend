@@ -5,7 +5,7 @@ from django.urls import path
 from .models import *
 from rest_framework import serializers, generics, permissions
 from .models import TradeJournalEntry
-from .serializers import NFTBadgeSerializer
+
 User = get_user_model()
 
 
@@ -28,6 +28,17 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
+
+class NFTBadgeSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = NFTBadge
+        fields = ['id', 'name', 'category', 'image_url', 'description', 'manually_assignable',
+                  'linked_user', 'linked_challenge', 'assigned_at']
+
+    def get_image_url(self, obj):
+        return obj.image_public_url
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
