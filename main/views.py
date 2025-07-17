@@ -893,23 +893,45 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import NFTBadge
+# @api_view(["POST"])
+# @permission_classes([IsAuthenticated])
+# def set_primary_badge(request):
+#     badge_id = request.data.get("badge_id")
+#     try:
+#         badge = NFTBadge.objects.get(id=badge_id)
+
+#         # ✅ Check ownership via linked_user
+#         if badge.linked_user_id != request.user.id:
+#             return Response({"error": "Badge not owned"}, status=403)
+
+#         request.user.profile.primary_badge = badge
+#         request.user.profile.save()
+#         return Response({"success": "Primary badge updated"})
+
+#     except NFTBadge.DoesNotExist:
+#         return Response({"error": "Badge not found"}, status=404)
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def set_primary_badge(request):
     badge_id = request.data.get("badge_id")
     try:
         badge = NFTBadge.objects.get(id=badge_id)
-
-        # ✅ Check ownership via linked_user
-        if badge.linked_user_id != request.user.id:
+        if badge.linked_user != request.user:
             return Response({"error": "Badge not owned"}, status=403)
 
-        request.user.profile.primary_badge = badge
-        request.user.profile.save()
-        return Response({"success": "Primary badge updated"})
+        profile = request.user.profile
+        profile.primary_badge = badge
 
+        # ✅ auto-set profile photo if not already set or override always
+        if badge.image:
+            profile.profile_photo = badge.image
+
+        profile.save()
+        return Response({"success": "Primary badge updated"})
     except NFTBadge.DoesNotExist:
         return Response({"error": "Badge not found"}, status=404)
+
 
 
 @api_view(['GET'])
