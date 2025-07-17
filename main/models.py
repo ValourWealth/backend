@@ -8,7 +8,7 @@ from django.conf import settings
 from VWBE.storage_backends import R2Storage
 from django.db import models
 from django.conf import settings
-from main.models import NFTBadge
+from .models import NFTBadge
 
 
 

@@ -5,7 +5,7 @@ from django.urls import path
 from .models import *
 from rest_framework import serializers, generics, permissions
 from .models import TradeJournalEntry
-from main.serializers import NFTBadgeSerializer
+from .serializers import NFTBadgeSerializer
 User = get_user_model()
 
 
