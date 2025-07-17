@@ -76,7 +76,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 
-User = get_user_model()
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -129,7 +129,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_user(self, user_id):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
         return User.objects.get(id=user_id)
+
 
     @database_sync_to_async
     def get_or_create_thread(self, user1, user2):
