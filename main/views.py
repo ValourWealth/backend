@@ -893,23 +893,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import NFTBadge
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def set_primary_badge(request):
-#     badge_id = request.data.get("badge_id")
-#     try:
-#         badge = NFTBadge.objects.get(id=badge_id)
-
-#         # ✅ Check ownership via linked_user
-#         if badge.linked_user_id != request.user.id:
-#             return Response({"error": "Badge not owned"}, status=403)
-
-#         request.user.profile.primary_badge = badge
-#         request.user.profile.save()
-#         return Response({"success": "Primary badge updated"})
-
-#     except NFTBadge.DoesNotExist:
-#         return Response({"error": "Badge not found"}, status=404)
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -970,17 +953,55 @@ from rest_framework.permissions import AllowAny
 from .models import NFTBadge
 from .serializers import NFTBadgeSerializer
 
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def nft_marketplace_list(request):
+#     category = request.GET.get('category')
+#     if category:
+#         badges = NFTBadge.objects.filter(category=category)
+#     else:
+#         badges = NFTBadge.objects.all()
+
+#     serializer = NFTBadgeSerializer(badges, many=True)
+#     return Response(serializer.data)
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from .models import NFTBadge, ChallengeParticipant
+from .serializers import NFTBadgeSerializer
+from django.db.models import Q
+
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def nft_marketplace_list(request):
     category = request.GET.get('category')
+    user = request.user
+
+    # Fetch user's participated challenges and the categories of their assigned badges (if any)
+    participated_challenges = ChallengeParticipant.objects.filter(user=user)
+    allowed_categories = NFTBadge.objects.filter(linked_challenge__in=participated_challenges.values('challenge')).values_list('category', flat=True)
+
     if category:
         badges = NFTBadge.objects.filter(category=category)
     else:
         badges = NFTBadge.objects.all()
 
-    serializer = NFTBadgeSerializer(badges, many=True)
-    return Response(serializer.data)
+    # Build response manually with extra field `can_collect`
+    result = []
+    for badge in badges:
+        result.append({
+            "id": badge.id,
+            "name": badge.name,
+            "category": badge.category,
+            "description": badge.description,
+            "image_url": badge.image_public_url,
+            "linked_user": badge.linked_user_id,
+            "can_collect": badge.linked_user is None and badge.category in allowed_categories
+        })
+
+    return Response(result)
+
+
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
