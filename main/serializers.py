@@ -132,7 +132,8 @@ from .models import PlatformWalkthroughVideo
 
 class PlatformWalkthroughVideoSerializer(serializers.ModelSerializer):
     video_url = serializers.ReadOnlyField()
-    thumbnail_url = serializers.ReadOnlyField()
+    public_url = serializers.ReadOnlyField()
+    thumbnail_url = serializers.SerializerMethodField()
 
     class Meta:
         model = PlatformWalkthroughVideo
@@ -149,9 +150,11 @@ class PlatformWalkthroughVideoSerializer(serializers.ModelSerializer):
             "uploaded_at",
             "video_url",
             "thumbnail_url",
+            "public_url"
         ]
-
-
+        
+    def get_thumbnail(self, obj):
+        return obj.thumbnail_public_url
 
 
 # ********************************************************************************************************************************************************************************
