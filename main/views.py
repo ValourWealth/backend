@@ -2510,7 +2510,7 @@ class PlatinumBriefingListAPIView(APIView):
 
 
 # =============================================================================================================
-# =============================================================================================================
+# =============================================Trade Journal Dashboard================================================================
 # =============================================================================================================
 # =============================================================================================================
 
@@ -2547,14 +2547,35 @@ class TradeViewSet(viewsets.ModelViewSet):
 
 
 # ===================== AlphaVantage Helper =====================
+# def get_best_exit_price(symbol, entry_date, exit_date):
+#     try:
+#         url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={ALPHA_VANTAGE_API_KEY}"
+#         response = requests.get(url)
+#         data = response.json().get("Time Series (Daily)", {})
+#         best = 0
+
+#         for date_str, prices in data.items():
+#             date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+#             if entry_date <= date_obj <= exit_date:
+#                 high = float(prices["2. high"])
+#                 best = max(best, high)
+
+#         return best
+#     except Exception as e:
+#         print(f"Alpha error for {symbol}: {e}")
+#         return 0
+
 def get_best_exit_price(symbol, entry_date, exit_date):
     try:
+        symbol = symbol.upper()  # force uppercase
         url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={ALPHA_VANTAGE_API_KEY}"
         response = requests.get(url)
-        data = response.json().get("Time Series (Daily)", {})
-        best = 0
+        data = response.json()
+        print(f"AlphaVantage raw response for {symbol}: {data}")  # log full JSON
+        daily_prices = data.get("Time Series (Daily)", {})
 
-        for date_str, prices in data.items():
+        best = 0
+        for date_str, prices in daily_prices.items():
             date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
             if entry_date <= date_obj <= exit_date:
                 high = float(prices["2. high"])
@@ -2566,7 +2587,10 @@ def get_best_exit_price(symbol, entry_date, exit_date):
         return 0
 
 
-# ===================== DeepSeek Summary =====================
+
+# ===================== DeepSeek Summary =====================import requests
+import json
+
 def generate_ai_summary(trades):
     trade_summaries = [
         f"{t.symbol} {t.side} | Entry: {t.entry_price} | Exit: {t.exit_price} | Qty: {t.quantity} | Duration: {t.duration} | Notes: {t.notes or 'None'}"
@@ -2580,15 +2604,54 @@ def generate_ai_summary(trades):
     )
 
     try:
-        openai.api_key = DEEPSEEK_API_KEY
-        response = openai.ChatCompletion.create(
-            model="deepseek-chat",
-            messages=[{"role": "user", "content": prompt}]
+        res = requests.post(
+            "https://api.deepseek.com/chat/completions",
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+            },
+            data=json.dumps({
+                "model": "deepseek-chat",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are a professional trading analyst. Provide sharp insights based on trade data."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            })
         )
-        return response.choices[0].message.content
+        res.raise_for_status()
+        return res.json()["choices"][0]["message"]["content"]
     except Exception as e:
-        print(f"DeepSeek error: {e}")
+        print("🚨 DeepSeek summary error:", e)
         return "AI summary unavailable."
+
+# def generate_ai_summary(trades):
+#     trade_summaries = [
+#         f"{t.symbol} {t.side} | Entry: {t.entry_price} | Exit: {t.exit_price} | Qty: {t.quantity} | Duration: {t.duration} | Notes: {t.notes or 'None'}"
+#         for t in trades
+#     ]
+
+#     prompt = (
+#         "You are an expert trading analyst. Analyze the following trades:\n\n"
+#         + "\n".join(trade_summaries)
+#         + "\n\nGive an overall performance summary, highlight trade styles, risk trends, and suggestions."
+#     )
+
+#     try:
+#         openai.api_key = DEEPSEEK_API_KEY
+#         response = openai.ChatCompletion.create(
+#             model="deepseek-chat",
+#             messages=[{"role": "user", "content": prompt}]
+#         )
+#         return response.choices[0].message.content
+#     except Exception as e:
+#         print(f"DeepSeek error: {e}")
+#         return "AI summary unavailable."
 
 
 def generate_exit_analysis_ai_summary(trades):
