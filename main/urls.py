@@ -77,6 +77,8 @@ urlpatterns = [
     path('courses/<int:course_id>/levels/<int:level_id>/mcqs/', MCQQuestionListAPIView.as_view()),
     path('courses/<int:course_id>/levels/<int:level_id>/mcqs/submit/', SubmitQuizAPIView.as_view()),
     path('user/courses/progress/', all_courses_progress, name='all-courses-progress'),
+    path('api/courses/current/progress/', get_current_course_progress),
+
 
 
     # platfomr walkthrough

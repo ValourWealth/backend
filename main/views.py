@@ -1478,6 +1478,62 @@ class SubmitQuizAPIView(APIView):
             "score": score_percentage,
             "passed": passed
         })
+        
+# /courses/current/progress/   overall progress 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_current_course_progress(request):
+    user = request.user
+    latest_enrollment = (
+        CourseEnrollment.objects
+        .filter(user=user)
+        .select_related('course')
+        .order_by('-enrolled_at')
+        .first()
+    )
+
+    if not latest_enrollment:
+        return Response({'detail': 'No course enrolled'}, status=404)
+
+    course = latest_enrollment.course
+
+    # Reuse your existing logic from get_course_progress
+    levels = course.levels.all()
+    total_videos = 0
+    watched_videos = 0
+    level_progress = []
+
+    for level in levels:
+        videos = level.videos.all()
+        total = videos.count()
+        watched = VideoProgress.objects.filter(user=user, video__in=videos, watched=True).count()
+        total_videos += total
+        watched_videos += watched
+
+        quiz_result = LevelProgress.objects.filter(user=user, course_level=level).first()
+        quiz_score = round(quiz_result.quiz_score or 0, 2) if quiz_result and quiz_result.passed_quiz else 0
+
+        level_progress.append({
+            'level': level.level,
+            'watched': watched,
+            'total': total,
+            'percent': int((watched / total) * 100) if total > 0 else 0,
+            'quiz_score': quiz_score
+        })
+
+    total_percent = int((watched_videos / total_videos) * 100) if total_videos > 0 else 0
+    passed_levels = LevelProgress.objects.filter(user=user, passed_quiz=True).values_list('course_level__level', flat=True)
+
+    return Response({
+        'course_id': course.id,
+        'course_name': course.title,
+        'levels': level_progress,
+        'total_progress': total_percent,
+        'total_videos': total_videos,
+        'watched_videos': watched_videos,
+        'passed_levels': list(passed_levels),
+    })
+
 
 # ********************************************************************************************************************************************************************************
 # ********************************************************************************************************************************************************************************
