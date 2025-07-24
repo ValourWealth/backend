@@ -2664,6 +2664,119 @@ def generate_exit_analysis_ai_summary(trades):
         return "AI analysis unavailable."
 
 
+# @api_view(["GET"])
+# @permission_classes([IsAuthenticated])
+# def trade_journal_dashboard(request):
+#     user = request.user
+#     trades = Trade.objects.filter(user=user)
+#     total_pnl = sum(t.profit_loss for t in trades)
+
+#     winning = [t for t in trades if t.profit_loss > 0]
+#     losing = [t for t in trades if t.profit_loss <= 0]
+
+#     win_rate = round(len(winning) / trades.count() * 100, 2) if trades.exists() else 0
+#     avg_win = round(np.mean([t.profit_loss for t in winning]), 2) if winning else 0
+#     avg_loss = round(np.mean([t.profit_loss for t in losing]), 2) if losing else 0
+#     risk_reward = round(abs(avg_win / avg_loss), 2) if avg_loss else 0
+
+#     excellent = good = average = poor = 0
+#     missed_total = 0
+#     lowest_perf = 999
+#     worst_trade = None
+#     detailed_exit_analysis = []
+#     worst_exit_performers = []
+
+#     for t in trades:
+#         best_exit = get_best_exit_price(t.symbol, t.entry_date, t.exit_date)
+
+
+#         # Handle fallback to avoid division by 0 or stale prices
+#         if not best_exit or best_exit < float(t.exit_price):
+#             best_exit = float(t.exit_price)
+
+#         exit_price = float(t.exit_price)
+#         best_exit = float(best_exit) if best_exit else exit_price
+#         # Smart fallback logic if API fails or returns a stale value
+#         if not best_exit:
+#             if t.side.lower() == "long":
+#                 best_exit = round(exit_price * 1.1, 2)  # Assume 10% higher possible
+#             else:
+#                 best_exit = round(exit_price * 0.9, 2)  # Assume 10% lower possible
+#         else:
+#             best_exit = float(best_exit)
+#         perf = round((exit_price / best_exit) * 100, 2)
+#         missed = round((best_exit - exit_price) * float(t.quantity), 2)
+#         missed_total += max(missed, 0)
+
+#         reason = (
+#             "Optimal exit" if perf >= 80 else
+#             "Good timing" if perf >= 60 else
+#             "Average exit" if perf >= 40 else
+#             "Exited too early"
+#         )
+
+#         detailed_exit_analysis.append({
+#             "ticker": t.symbol,
+#             "side": t.side,
+#             "actualExit": float(t.exit_price),
+#             "bestExit": best_exit,
+#             "performance": perf,
+#             "missedProfit": max(missed, 0),
+#             "reason": reason
+#         })
+
+#         if perf >= 80:
+#             excellent += 1
+#         elif 60 <= perf < 80:
+#             good += 1
+#         elif 40 <= perf < 60:
+#             average += 1
+#         else:
+#             poor += 1
+
+#         if perf < lowest_perf:
+#             lowest_perf = perf
+#             worst_trade = {
+#                 "ticker": t.symbol,
+#                 "position": t.side,
+#                 "missedAmount": max(missed, 0),
+#                 "exitPerformance": perf
+#             }
+
+#     if worst_trade:
+#         worst_exit_performers.append(worst_trade)
+
+#     total_trades = trades.count()
+
+#     exit_analysis = {
+#         "averageExitPerformance": round((excellent * 90 + good * 70 + average * 50 + poor * 30) / total_trades, 1) if total_trades else 0,
+#         "missedProfitOpportunities": round(missed_total, 2),
+#         "optimalExitTrades": excellent,
+#         "earlyExitTrades": poor,
+#         "exitPerformanceDistribution": {
+#             "excellent": {"count": excellent, "percentage": round(excellent / total_trades * 100, 1) if total_trades else 0},
+#             "good": {"count": good, "percentage": round(good / total_trades * 100, 1) if total_trades else 0},
+#             "average": {"count": average, "percentage": round(average / total_trades * 100, 1) if total_trades else 0},
+#             "poor": {"count": poor, "percentage": round(poor / total_trades * 100, 1) if total_trades else 0}
+#         },
+#         "worstExitPerformers": worst_exit_performers,
+#         "detailedExitAnalysis": detailed_exit_analysis,
+#         "ai_exit_summary": generate_exit_analysis_ai_summary(trades)
+#     }
+
+#     return Response({
+#         "total_pnl": total_pnl,
+#         "total_trades": total_trades,
+#         "win_rate": win_rate,
+#         "avg_win": avg_win,
+#         "avg_loss": avg_loss,
+#         "risk_reward": risk_reward,
+#         "win_trades": len(winning),
+#         "loss_trades": len(losing),
+#         "deepseek_summary": generate_ai_summary(trades),
+#         "trading_analysis": exit_analysis
+#     })
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def trade_journal_dashboard(request):
@@ -2687,14 +2800,21 @@ def trade_journal_dashboard(request):
     worst_exit_performers = []
 
     for t in trades:
+        exit_price = float(t.exit_price)
+
+        # Get best exit from API or fallback logic
         best_exit = get_best_exit_price(t.symbol, t.entry_date, t.exit_date)
 
-        # Handle fallback to avoid division by 0 or stale prices
-        if not best_exit or best_exit < float(t.exit_price):
-            best_exit = float(t.exit_price)
+        if best_exit is None:
+            # No data from API, use smart assumption
+            best_exit = round(exit_price * 1.1, 2) if t.side.lower() == "long" else round(exit_price * 0.9, 2)
+        else:
+            best_exit = float(best_exit)
 
-        exit_price = float(t.exit_price)
-        best_exit = float(best_exit) if best_exit else exit_price
+        # Prevent division by 0 or unrealistic results
+        if best_exit == 0:
+            best_exit = exit_price
+
         perf = round((exit_price / best_exit) * 100, 2)
         missed = round((best_exit - exit_price) * float(t.quantity), 2)
         missed_total += max(missed, 0)
@@ -2709,7 +2829,7 @@ def trade_journal_dashboard(request):
         detailed_exit_analysis.append({
             "ticker": t.symbol,
             "side": t.side,
-            "actualExit": float(t.exit_price),
+            "actualExit": exit_price,
             "bestExit": best_exit,
             "performance": perf,
             "missedProfit": max(missed, 0),
@@ -2740,7 +2860,9 @@ def trade_journal_dashboard(request):
     total_trades = trades.count()
 
     exit_analysis = {
-        "averageExitPerformance": round((excellent * 90 + good * 70 + average * 50 + poor * 30) / total_trades, 1) if total_trades else 0,
+        "averageExitPerformance": round(
+            (excellent * 90 + good * 70 + average * 50 + poor * 30) / total_trades, 1
+        ) if total_trades else 0,
         "missedProfitOpportunities": round(missed_total, 2),
         "optimalExitTrades": excellent,
         "earlyExitTrades": poor,
