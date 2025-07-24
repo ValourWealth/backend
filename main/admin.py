@@ -512,10 +512,6 @@ admin.site.register(Ana_Message)
 
 
 
-
-
-
-from django.contrib import admin
 from .models import Trade
 
 @admin.register(Trade)
