@@ -165,6 +165,7 @@ from rest_framework import serializers
 from .models import Trade
 
 class TradeSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
     profit_loss = serializers.SerializerMethodField()
     return_pct = serializers.SerializerMethodField()
     duration = serializers.SerializerMethodField()
