@@ -2549,12 +2549,15 @@ class TradeViewSet(viewsets.ModelViewSet):
 # ===================== AlphaVantage Helper =====================
 # def get_best_exit_price(symbol, entry_date, exit_date):
 #     try:
+#         symbol = symbol.upper()  # force uppercase
 #         url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={ALPHA_VANTAGE_API_KEY}"
 #         response = requests.get(url)
-#         data = response.json().get("Time Series (Daily)", {})
-#         best = 0
+#         data = response.json()
+#         print(f"AlphaVantage raw response for {symbol}: {data}")  # log full JSON
+#         daily_prices = data.get("Time Series (Daily)", {})
 
-#         for date_str, prices in data.items():
+#         best = 0
+#         for date_str, prices in daily_prices.items():
 #             date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
 #             if entry_date <= date_obj <= exit_date:
 #                 high = float(prices["2. high"])
@@ -2564,26 +2567,30 @@ class TradeViewSet(viewsets.ModelViewSet):
 #     except Exception as e:
 #         print(f"Alpha error for {symbol}: {e}")
 #         return 0
-
 def get_best_exit_price(symbol, entry_date, exit_date):
     try:
-        symbol = symbol.upper()  # force uppercase
+        symbol = symbol.upper()
         url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={ALPHA_VANTAGE_API_KEY}"
         response = requests.get(url)
         data = response.json()
-        print(f"AlphaVantage raw response for {symbol}: {data}")  # log full JSON
-        daily_prices = data.get("Time Series (Daily)", {})
 
+        if "Time Series (Daily)" not in data:
+            print(f"🚨 Error fetching Alpha data for {symbol}:", data.get("Note") or data.get("Error Message") or data)
+            return 0
+
+        daily_prices = data["Time Series (Daily)"]
         best = 0
+
         for date_str, prices in daily_prices.items():
             date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
             if entry_date <= date_obj <= exit_date:
                 high = float(prices["2. high"])
                 best = max(best, high)
 
+        print(f"✅ {symbol} best exit price between {entry_date} and {exit_date} = {best}")
         return best
     except Exception as e:
-        print(f"Alpha error for {symbol}: {e}")
+        print(f"🚨 AlphaVantage error for {symbol}: {e}")
         return 0
 
 
@@ -2630,29 +2637,6 @@ def generate_ai_summary(trades):
         print("🚨 DeepSeek summary error:", e)
         return "AI summary unavailable."
 
-# def generate_ai_summary(trades):
-#     trade_summaries = [
-#         f"{t.symbol} {t.side} | Entry: {t.entry_price} | Exit: {t.exit_price} | Qty: {t.quantity} | Duration: {t.duration} | Notes: {t.notes or 'None'}"
-#         for t in trades
-#     ]
-
-#     prompt = (
-#         "You are an expert trading analyst. Analyze the following trades:\n\n"
-#         + "\n".join(trade_summaries)
-#         + "\n\nGive an overall performance summary, highlight trade styles, risk trends, and suggestions."
-#     )
-
-#     try:
-#         openai.api_key = DEEPSEEK_API_KEY
-#         response = openai.ChatCompletion.create(
-#             model="deepseek-chat",
-#             messages=[{"role": "user", "content": prompt}]
-#         )
-#         return response.choices[0].message.content
-#     except Exception as e:
-#         print(f"DeepSeek error: {e}")
-#         return "AI summary unavailable."
-
 
 def generate_exit_analysis_ai_summary(trades):
     lines = []
@@ -2680,79 +2664,6 @@ def generate_exit_analysis_ai_summary(trades):
 
 
 # ===================== Dashboard Metrics API =====================
-# @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
-# def trade_journal_dashboard(request):
-#     user = request.user
-#     trades = Trade.objects.filter(user=user)
-#     total_pnl = sum(t.profit_loss for t in trades)
-
-#     winning = [t for t in trades if t.profit_loss > 0]
-#     losing = [t for t in trades if t.profit_loss <= 0]
-
-#     win_rate = round(len(winning) / trades.count() * 100, 2) if trades.exists() else 0
-#     avg_win = round(np.mean([t.profit_loss for t in winning]), 2) if winning else 0
-#     avg_loss = round(np.mean([t.profit_loss for t in losing]), 2) if losing else 0
-#     risk_reward = round(abs(avg_win / avg_loss), 2) if avg_loss else 0
-
-#     # Exit performance
-#     excellent = good = average = poor = 0
-#     missed_total = 0
-#     worst_trade = None
-#     lowest_perf = 999
-
-#     for t in trades:
-#         best_exit = get_best_exit_price(t.symbol, t.entry_date, t.exit_date)
-#         if best_exit and t.exit_price:
-#             perf = round((t.exit_price / best_exit) * 100, 2)
-#             missed = round((best_exit - t.exit_price) * t.quantity, 2)
-#             missed_total += max(missed, 0)
-
-#             if perf >= 80:
-#                 excellent += 1
-#             elif 60 <= perf < 80:
-#                 good += 1
-#             elif 40 <= perf < 60:
-#                 average += 1
-#             else:
-#                 poor += 1
-
-#             if perf < lowest_perf:
-#                 lowest_perf = perf
-#                 worst_trade = {
-#                     "symbol": t.symbol,
-#                     "side": t.side,
-#                     "missed_profit": missed,
-#                     "performance": perf,
-#                 }
-
-#     exit_performance = {
-#         "average": round((excellent * 90 + good * 70 + average * 50 + poor * 30) / trades.count(), 1) if trades else 0,
-#         "optimal_exits": excellent,
-#         "early_exits": poor,
-#         "missed_profits": round(missed_total, 2),
-#         "distribution": {
-#             "excellent": excellent,
-#             "good": good,
-#             "average": average,
-#             "poor": poor
-#         },
-#         "worst_exit": worst_trade
-#     }
-
-#     return Response({
-#         "total_pnl": total_pnl,
-#         "total_trades": trades.count(),
-#         "win_rate": win_rate,
-#         "avg_win": avg_win,
-#         "avg_loss": avg_loss,
-#         "risk_reward": risk_reward,
-#         "win_trades": len(winning),
-#         "loss_trades": len(losing),
-#         "exit_performance": exit_performance,
-#         "deepseek_summary": generate_ai_summary(trades)
-#     })
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def trade_journal_dashboard(request):
