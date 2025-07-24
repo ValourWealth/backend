@@ -2535,7 +2535,105 @@ def generate_ai_summary(trades):
         return "AI summary unavailable."
 
 
+def generate_exit_analysis_ai_summary(trades):
+    lines = []
+    for t in trades:
+        lines.append(f"{t.symbol} | {t.side} | Entry: {t.entry_price} | Exit: {t.exit_price} | BestExit: {get_best_exit_price(t.symbol, t.entry_date, t.exit_date)} | Notes: {t.notes or 'None'}")
+
+    prompt = (
+        "You're a trading coach. Analyze the following exit performances from a trader:\n\n"
+        + "\n".join(lines)
+        + "\n\nGive insights into exit timing, risk-reward patterns, psychological mistakes, and tips to improve future exits."
+    )
+
+    try:
+        openai.api_key = DEEPSEEK_API_KEY
+        response = openai.ChatCompletion.create(
+            model="deepseek-chat",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"DeepSeek error: {e}")
+        return "AI analysis unavailable."
+
+
+
+
 # ===================== Dashboard Metrics API =====================
+# @api_view(["GET"])
+# @permission_classes([IsAuthenticated])
+# def trade_journal_dashboard(request):
+#     user = request.user
+#     trades = Trade.objects.filter(user=user)
+#     total_pnl = sum(t.profit_loss for t in trades)
+
+#     winning = [t for t in trades if t.profit_loss > 0]
+#     losing = [t for t in trades if t.profit_loss <= 0]
+
+#     win_rate = round(len(winning) / trades.count() * 100, 2) if trades.exists() else 0
+#     avg_win = round(np.mean([t.profit_loss for t in winning]), 2) if winning else 0
+#     avg_loss = round(np.mean([t.profit_loss for t in losing]), 2) if losing else 0
+#     risk_reward = round(abs(avg_win / avg_loss), 2) if avg_loss else 0
+
+#     # Exit performance
+#     excellent = good = average = poor = 0
+#     missed_total = 0
+#     worst_trade = None
+#     lowest_perf = 999
+
+#     for t in trades:
+#         best_exit = get_best_exit_price(t.symbol, t.entry_date, t.exit_date)
+#         if best_exit and t.exit_price:
+#             perf = round((t.exit_price / best_exit) * 100, 2)
+#             missed = round((best_exit - t.exit_price) * t.quantity, 2)
+#             missed_total += max(missed, 0)
+
+#             if perf >= 80:
+#                 excellent += 1
+#             elif 60 <= perf < 80:
+#                 good += 1
+#             elif 40 <= perf < 60:
+#                 average += 1
+#             else:
+#                 poor += 1
+
+#             if perf < lowest_perf:
+#                 lowest_perf = perf
+#                 worst_trade = {
+#                     "symbol": t.symbol,
+#                     "side": t.side,
+#                     "missed_profit": missed,
+#                     "performance": perf,
+#                 }
+
+#     exit_performance = {
+#         "average": round((excellent * 90 + good * 70 + average * 50 + poor * 30) / trades.count(), 1) if trades else 0,
+#         "optimal_exits": excellent,
+#         "early_exits": poor,
+#         "missed_profits": round(missed_total, 2),
+#         "distribution": {
+#             "excellent": excellent,
+#             "good": good,
+#             "average": average,
+#             "poor": poor
+#         },
+#         "worst_exit": worst_trade
+#     }
+
+#     return Response({
+#         "total_pnl": total_pnl,
+#         "total_trades": trades.count(),
+#         "win_rate": win_rate,
+#         "avg_win": avg_win,
+#         "avg_loss": avg_loss,
+#         "risk_reward": risk_reward,
+#         "win_trades": len(winning),
+#         "loss_trades": len(losing),
+#         "exit_performance": exit_performance,
+#         "deepseek_summary": generate_ai_summary(trades)
+#     })
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def trade_journal_dashboard(request):
@@ -2551,18 +2649,40 @@ def trade_journal_dashboard(request):
     avg_loss = round(np.mean([t.profit_loss for t in losing]), 2) if losing else 0
     risk_reward = round(abs(avg_win / avg_loss), 2) if avg_loss else 0
 
-    # Exit performance
+    # Exit performance breakdown
     excellent = good = average = poor = 0
     missed_total = 0
-    worst_trade = None
     lowest_perf = 999
+    worst_trade = None
+    detailed_exit_analysis = []
+    worst_exit_performers = []
 
     for t in trades:
         best_exit = get_best_exit_price(t.symbol, t.entry_date, t.exit_date)
         if best_exit and t.exit_price:
             perf = round((t.exit_price / best_exit) * 100, 2)
-            missed = round((best_exit - t.exit_price) * t.quantity, 2)
+            missed = round((best_exit - t.exit_price) * float(t.quantity), 2)
             missed_total += max(missed, 0)
+
+            reason = (
+                "Optimal exit"
+                if perf >= 80 else
+                "Good timing"
+                if perf >= 60 else
+                "Average exit"
+                if perf >= 40 else
+                "Exited too early"
+            )
+
+            detailed_exit_analysis.append({
+                "ticker": t.symbol,
+                "side": t.side,
+                "actualExit": float(t.exit_price),
+                "bestExit": best_exit,
+                "performance": perf,
+                "missedProfit": max(missed, 0),
+                "reason": reason
+            })
 
             if perf >= 80:
                 excellent += 1
@@ -2576,37 +2696,56 @@ def trade_journal_dashboard(request):
             if perf < lowest_perf:
                 lowest_perf = perf
                 worst_trade = {
-                    "symbol": t.symbol,
-                    "side": t.side,
-                    "missed_profit": missed,
-                    "performance": perf,
+                    "ticker": t.symbol,
+                    "position": t.side,
+                    "missedAmount": max(missed, 0),
+                    "exitPerformance": perf
                 }
 
-    exit_performance = {
-        "average": round((excellent * 90 + good * 70 + average * 50 + poor * 30) / trades.count(), 1) if trades else 0,
-        "optimal_exits": excellent,
-        "early_exits": poor,
-        "missed_profits": round(missed_total, 2),
-        "distribution": {
-            "excellent": excellent,
-            "good": good,
-            "average": average,
-            "poor": poor
+    if worst_trade:
+        worst_exit_performers.append(worst_trade)
+
+    total_trades = trades.count()
+
+    exit_analysis = {
+        "averageExitPerformance": round((excellent * 90 + good * 70 + average * 50 + poor * 30) / total_trades, 1) if total_trades else 0,
+        "missedProfitOpportunities": round(missed_total, 2),
+        "optimalExitTrades": excellent,
+        "earlyExitTrades": poor,
+        "exitPerformanceDistribution": {
+            "excellent": {
+                "count": excellent,
+                "percentage": round(excellent / total_trades * 100, 1) if total_trades else 0
+            },
+            "good": {
+                "count": good,
+                "percentage": round(good / total_trades * 100, 1) if total_trades else 0
+            },
+            "average": {
+                "count": average,
+                "percentage": round(average / total_trades * 100, 1) if total_trades else 0
+            },
+            "poor": {
+                "count": poor,
+                "percentage": round(poor / total_trades * 100, 1) if total_trades else 0
+            }
         },
-        "worst_exit": worst_trade
+        "worstExitPerformers": worst_exit_performers,
+        "detailedExitAnalysis": detailed_exit_analysis,
+        "ai_exit_summary": generate_exit_analysis_ai_summary(trades)
     }
 
     return Response({
         "total_pnl": total_pnl,
-        "total_trades": trades.count(),
+        "total_trades": total_trades,
         "win_rate": win_rate,
         "avg_win": avg_win,
         "avg_loss": avg_loss,
         "risk_reward": risk_reward,
         "win_trades": len(winning),
         "loss_trades": len(losing),
-        "exit_performance": exit_performance,
-        "deepseek_summary": generate_ai_summary(trades)
+        "deepseek_summary": generate_ai_summary(trades),
+        "trading_analysis": exit_analysis
     })
 
 
