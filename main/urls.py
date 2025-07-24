@@ -51,7 +51,8 @@ challengerouter = DefaultRouter()
 challengerouter.register(r'challenges', ChallengeViewSet, basename='challenges')
 challengerouter.register(r'challenge-participants', ChallengeParticipantViewSet, basename='challenge-participants')
 
-
+trade_router = DefaultRouter()
+trade_router.register(r'trades', TradeViewSet, basename='trade')
 
 
 urlpatterns = [
@@ -94,6 +95,8 @@ urlpatterns = [
     path('api/chat/my-conversations/', MyConversationsView.as_view()),
     path('api/chat/send/', SendMessageView.as_view()),
     
+    
+    path('api/', include(trade_router.urls)),
     
     path("api/analyst-chat/start/", start_analyst_chat),
     path("api/analyst-chat/", AnalystChatDetailView.as_view()),

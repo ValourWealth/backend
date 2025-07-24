@@ -2452,6 +2452,27 @@ class PlatinumBriefingListAPIView(APIView):
         return Response(serializer.data)
 
 
+
+# VWBE/views.py
+
+from rest_framework import viewsets, permissions
+from .models import Trade
+from .serializers import TradeSerializer
+from .permissions import IsPlatinumUser
+
+class TradeViewSet(viewsets.ModelViewSet):
+    serializer_class = TradeSerializer
+    permission_classes = [permissions.IsAuthenticated, IsPlatinumUser]
+
+    def get_queryset(self):
+        return Trade.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+
+
 # ********************************************************************************************************************************************************************************
 # ********************************************************************************************************************************************************************************
 # ********************************************************************************************************************************************************************************

@@ -157,6 +157,21 @@ class PlatformWalkthroughVideoSerializer(serializers.ModelSerializer):
         return obj.thumbnail_public_url
 
 
+
+
+
+from rest_framework import serializers
+from .models import Trade
+
+class TradeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trade
+        fields = '__all__'
+        read_only_fields = ['user', 'pnl', 'is_win', 'trade_duration', 'created_at']
+
+
+
+
 # ********************************************************************************************************************************************************************************
 
 # from .models import Webinar

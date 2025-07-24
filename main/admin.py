@@ -509,3 +509,16 @@ class ChallengeParticipantAdmin(admin.ModelAdmin):
 
 admin.site.register(ChatThread)
 admin.site.register(Ana_Message)
+
+
+
+
+
+
+from django.contrib import admin
+from .models import Trade
+
+@admin.register(Trade)
+class TradeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'symbol', 'side', 'pnl', 'is_win', 'created_at')
+    search_fields = ('symbol', 'user__username')
