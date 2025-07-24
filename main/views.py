@@ -2693,8 +2693,10 @@ def trade_journal_dashboard(request):
         if not best_exit or best_exit < float(t.exit_price):
             best_exit = float(t.exit_price)
 
-        perf = round((t.exit_price / best_exit) * 100, 2)
-        missed = round((best_exit - t.exit_price) * float(t.quantity), 2)
+        exit_price = float(t.exit_price)
+        best_exit = float(best_exit) if best_exit else exit_price
+        perf = round((exit_price / best_exit) * 100, 2)
+        missed = round((best_exit - exit_price) * float(t.quantity), 2)
         missed_total += max(missed, 0)
 
         reason = (
@@ -2767,44 +2769,44 @@ def trade_journal_dashboard(request):
     })
 
 
-# def generate_ai_summary(trades):
-#     trade_summaries = [
-#         f"{t.symbol} {t.side} | Entry: {t.entry_price} | Exit: {t.exit_price} | Qty: {t.quantity} | Duration: {t.duration} | Notes: {t.notes or 'None'}"
-#         for t in trades
-#     ]
+def generate_ai_summary(trades):
+    trade_summaries = [
+        f"{t.symbol} {t.side} | Entry: {t.entry_price} | Exit: {t.exit_price} | Qty: {t.quantity} | Duration: {t.duration} | Notes: {t.notes or 'None'}"
+        for t in trades
+    ]
 
-#     prompt = (
-#         "You are an expert trading analyst. Analyze the following trades:\n\n"
-#         + "\n".join(trade_summaries)
-#         + "\n\nGive an overall performance summary, highlight trade styles, risk trends, and suggestions."
-#     )
+    prompt = (
+        "You are an expert trading analyst. Analyze the following trades:\n\n"
+        + "\n".join(trade_summaries)
+        + "\n\nGive an overall performance summary, highlight trade styles, risk trends, and suggestions."
+    )
 
-#     try:
-#         res = requests.post(
-#             "https://api.deepseek.com/chat/completions",
-#             headers={
-#                 "Content-Type": "application/json",
-#                 "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
-#             },
-#             data=json.dumps({
-#                 "model": "deepseek-chat",
-#                 "messages": [
-#                     {
-#                         "role": "system",
-#                         "content": "You are a professional trading analyst. Provide sharp insights based on trade data."
-#                     },
-#                     {
-#                         "role": "user",
-#                         "content": prompt
-#                     }
-#                 ]
-#             })
-#         )
-#         res.raise_for_status()
-#         return res.json()["choices"][0]["message"]["content"]
-#     except Exception as e:
-#         print("🚨 DeepSeek summary error:", e)
-#         return "AI summary unavailable."
+    try:
+        res = requests.post(
+            "https://api.deepseek.com/chat/completions",
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+            },
+            data=json.dumps({
+                "model": "deepseek-chat",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are a professional trading analyst. Provide sharp insights based on trade data."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            })
+        )
+        res.raise_for_status()
+        return res.json()["choices"][0]["message"]["content"]
+    except Exception as e:
+        print("🚨 DeepSeek summary error:", e)
+        return "AI summary unavailable."
 
 
 # def generate_exit_analysis_ai_summary(trades):
