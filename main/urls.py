@@ -97,6 +97,8 @@ urlpatterns = [
     
     
     path('api/', include(trade_router.urls)),
+    path("api/dashboard/", trade_journal_dashboard, name="dashboard"),
+    path("api/trades/", user_trades, name="user_trades"),
     
     path("api/analyst-chat/start/", start_analyst_chat),
     path("api/analyst-chat/", AnalystChatDetailView.as_view()),

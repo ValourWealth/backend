@@ -160,15 +160,27 @@ class PlatformWalkthroughVideoSerializer(serializers.ModelSerializer):
 
 
 
+
 from rest_framework import serializers
 from .models import Trade
 
 class TradeSerializer(serializers.ModelSerializer):
+    profit_loss = serializers.SerializerMethodField()
+    return_pct = serializers.SerializerMethodField()
+    duration = serializers.SerializerMethodField()
+
     class Meta:
         model = Trade
         fields = '__all__'
-        read_only_fields = ['user', 'pnl', 'is_win', 'trade_duration', 'created_at']
 
+    def get_profit_loss(self, obj):
+        return obj.profit_loss
+
+    def get_return_pct(self, obj):
+        return obj.return_pct
+
+    def get_duration(self, obj):
+        return obj.duration
 
 
 

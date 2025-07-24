@@ -138,39 +138,43 @@ class LoginActivity(models.Model):
 # =====================================================================================================
 # =======================================Trade Journal=================================================
 # =====================================================================================================
-class Trade(models.Model):
-    SIDE_CHOICES = [
-        ('long', 'Long'),
-        ('short', 'Short'),
-    ]
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='trades')
+from django.db import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class Trade(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="trades")
     symbol = models.CharField(max_length=10)
-    side = models.CharField(max_length=10, choices=SIDE_CHOICES)
+    side = models.CharField(max_length=10, choices=[("Long", "Long"), ("Short", "Short")])
     entry_price = models.DecimalField(max_digits=10, decimal_places=2)
     exit_price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.PositiveIntegerField()
-    entry_date = models.DateField()
-    exit_date = models.DateField()
-    tags = models.JSONField(blank=True, null=True)  # store as list
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    entry_date = models.DateField(null=True, blank=True)
+    exit_date = models.DateField(null=True, blank=True)
     notes = models.TextField(blank=True, null=True)
-
-    pnl = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    is_win = models.BooleanField(blank=True, null=True)
-    trade_duration = models.IntegerField(blank=True, null=True)  # in days
-
+    tags = models.JSONField(default=list)  # List of tags
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def save(self, *args, **kwargs):
-        # Calculate PnL
-        multiplier = 1 if self.side == 'long' else -1
-        self.pnl = (self.exit_price - self.entry_price) * self.quantity * multiplier
-        self.is_win = self.pnl > 0
-        self.trade_duration = (self.exit_date - self.entry_date).days
-        super().save(*args, **kwargs)
+    @property
+    def profit_loss(self):
+        q = float(self.quantity)
+        ep = float(self.entry_price)
+        xp = float(self.exit_price)
+        return (xp - ep) * q if self.side == "Long" else (ep - xp) * q
 
-    def __str__(self):
-        return f"{self.user.username} - {self.symbol} ({self.side})"
+    @property
+    def return_pct(self):
+        ep = float(self.entry_price)
+        xp = float(self.exit_price)
+        return ((xp - ep) / ep * 100) if self.side == "Long" else ((ep - xp) / ep * 100)
+
+    @property
+    def duration(self):
+        if self.entry_date and self.exit_date:
+            return (self.exit_date - self.entry_date).days
+        return 0
 
 
 

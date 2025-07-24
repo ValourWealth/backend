@@ -512,9 +512,20 @@ admin.site.register(Ana_Message)
 
 
 
+from django.contrib import admin
 from .models import Trade
 
 @admin.register(Trade)
 class TradeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'symbol', 'side', 'pnl', 'is_win', 'created_at')
+    list_display = ('user', 'symbol', 'side', 'entry_price', 'exit_price', 'quantity', 'pnl', 'is_win', 'created_at')
     search_fields = ('symbol', 'user__username')
+    list_filter = ('side', 'created_at')
+
+    def pnl(self, obj):
+        return round(obj.profit_loss, 2)
+    pnl.short_description = 'P&L'
+
+    def is_win(self, obj):
+        return obj.profit_loss > 0
+    is_win.boolean = True
+    is_win.short_description = 'Win?'
