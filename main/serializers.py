@@ -129,7 +129,6 @@ class MessageSerializer(serializers.ModelSerializer):
 # =====================================================================================================================================
 from rest_framework import serializers
 from .models import PlatformWalkthroughVideo
-
 class PlatformWalkthroughVideoSerializer(serializers.ModelSerializer):
     video_url = serializers.ReadOnlyField()
     public_url = serializers.ReadOnlyField()
@@ -153,8 +152,8 @@ class PlatformWalkthroughVideoSerializer(serializers.ModelSerializer):
             "public_url"
         ]
         
-    def get_thumbnail(self, obj):
-        return obj.thumbnail_public_url
+    def get_thumbnail_url(self, obj):  # ✅ FIXED METHOD NAME
+        return obj.thumbnail_url  # ✅ FIXED PROPERTY NAME
 
 
 
