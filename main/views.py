@@ -93,7 +93,7 @@ class InboxList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        if request.user.profile.role == 'analyst':
+        if request.user.profile.role == 'platinum':
             threads = ChatThread.objects.all()
         else:
             threads = ChatThread.objects.filter(user=request.user)
