@@ -97,10 +97,12 @@ urlpatterns = [
     path('api/chat/my-conversations/', MyConversationsView.as_view()),
     path('api/chat/send/', SendMessageView.as_view()),
     
-    
+    # Trade journal dashboard
     path('api/', include(trade_router.urls)),
     path("api/dashboard/", trade_journal_dashboard, name="dashboard"),
     path("api/trades/", user_trades, name="user_trades"),
+    path("api/trade-report/", trade_report_summary, name="trade_report"),
+
     
     path("api/analyst-chat/start/", start_analyst_chat),
     path("api/analyst-chat/", AnalystChatDetailView.as_view()),
