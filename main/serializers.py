@@ -104,9 +104,17 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class UserMiniSerializer(serializers.ModelSerializer):
+    profile_photo_url = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'username']
+        fields = ['id', 'username', 'profile_photo_url']
+
+    def get_profile_photo_url(self, obj):
+        if hasattr(obj, "profile") and obj.profile.profile_photo:
+            return obj.profile.profile_photo_public_url
+        return None
+    
 
 class ChatThreadSerializer(serializers.ModelSerializer):
     user = UserMiniSerializer()
@@ -118,12 +126,14 @@ class ChatThreadSerializer(serializers.ModelSerializer):
         fields = ["id", "user", "analyst", "created_at", "other_party"]
 
     def get_other_party(self, obj):
-        request = self.context.get('request')
-        if request.user == obj.user:
-            return UserMiniSerializer(obj.analyst).data if obj.analyst else None
-        else:
-            return UserMiniSerializer(obj.user).data
+        request = self.context.get("request")
+        if request is None or not hasattr(request, "user"):
+            return None
 
+        if obj.analyst == request.user:
+            return UserMiniSerializer(obj.user).data
+        else:
+            return UserMiniSerializer(obj.analyst).data if obj.analyst else None
 
 
 class AnaMessageSerializer(serializers.ModelSerializer):

@@ -83,7 +83,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 from .models import ChatThread, Ana_Message
-from .serializers import ChatThreadSerializer, AnaMessageSerializer  # ✅ FIXED name
+from .serializers import ChatThreadSerializer, AnaMessageSerializer  
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
