@@ -93,10 +93,17 @@ class InboxList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        if request.user.profile.role == 'platinum':
-            threads = ChatThread.objects.all()
-        else:
+        user_profile = request.user.profile
+
+        if user_profile.role == 'analyst':
+            # Analyst sees all threads with platinum users
+            threads = ChatThread.objects.filter(user__profile__subscription_status='platinum')
+        elif user_profile.subscription_status == 'platinum':
+            # Platinum user sees their own threads with analysts
             threads = ChatThread.objects.filter(user=request.user)
+        else:
+            return Response([], status=403)
+
         return Response(ChatThreadSerializer(threads, many=True, context={"request": request}).data)
 
 
@@ -132,7 +139,6 @@ class VSendMessageView(APIView):
         )
         return Response(AnaMessageSerializer(message).data, status=201)  # ✅ FIXED name
 
-
 class GetOrCreateThread(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -143,12 +149,20 @@ class GetOrCreateThread(APIView):
 
         other_user = get_object_or_404(User, id=other_user_id)
 
+        if request.user.profile.role == 'analyst' and other_user.profile.subscription_status != 'platinum':
+            return Response({"error": "Only allowed with platinum users."}, status=403)
+
+        if request.user.profile.subscription_status == 'platinum' and other_user.profile.role != 'analyst':
+            return Response({"error": "Only allowed with analyst users."}, status=403)
+
+        # ✅ Now outside both checks — this will run if both roles are valid
         if request.user.profile.role == 'analyst':
             thread, _ = ChatThread.objects.get_or_create(user=other_user, analyst=request.user)
         else:
             thread, _ = ChatThread.objects.get_or_create(user=request.user, analyst=other_user)
 
         return Response(ChatThreadSerializer(thread).data)
+
 
 
 # ********************************************************************************************************************************************************************************
@@ -395,7 +409,7 @@ class AnalystChatDetailView(generics.RetrieveAPIView):
         return chat
 
 
-# ✅ Analyst sending or receiving message (must be a participant)
+# Analyst sending or receiving message (must be a participant)
 class AnalystMessageCreateView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -419,7 +433,7 @@ class AnalystMessageCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ✅ Assigned analyst (for platinum member)
+#  Assigned analyst (for platinum member)
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def assigned_analyst(request):
