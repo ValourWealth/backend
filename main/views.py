@@ -96,16 +96,18 @@ class InboxList(APIView):
         user_profile = request.user.profile
 
         if user_profile.role == 'analyst':
-            # Analyst sees all threads with platinum users
-            threads = ChatThread.objects.filter(user__profile__subscription_status='platinum')
+            # Analyst sees only threads with platinum users assigned to them
+            threads = ChatThread.objects.filter(
+                user__profile__subscription_status='platinum',
+                analyst=request.user
+            )
         elif user_profile.subscription_status == 'platinum':
-            # Platinum user sees their own threads with analysts
+            # Platinum user sees only their own thread
             threads = ChatThread.objects.filter(user=request.user)
         else:
             return Response([], status=403)
 
         return Response(ChatThreadSerializer(threads, many=True, context={"request": request}).data)
-
 
 
 class MessageList(APIView):
