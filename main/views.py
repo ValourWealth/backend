@@ -97,7 +97,8 @@ class InboxList(APIView):
             threads = ChatThread.objects.all()
         else:
             threads = ChatThread.objects.filter(user=request.user)
-        return Response(ChatThreadSerializer(threads, many=True).data)
+        return Response(ChatThreadSerializer(threads, many=True, context={"request": request}).data)
+
 
 
 class MessageList(APIView):

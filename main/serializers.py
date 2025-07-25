@@ -111,10 +111,19 @@ class UserMiniSerializer(serializers.ModelSerializer):
 class ChatThreadSerializer(serializers.ModelSerializer):
     user = UserMiniSerializer()
     analyst = UserMiniSerializer()
+    other_party = serializers.SerializerMethodField()
 
     class Meta:
         model = ChatThread
-        fields = "__all__"
+        fields = ["id", "user", "analyst", "created_at", "other_party"]
+
+    def get_other_party(self, obj):
+        request = self.context.get('request')
+        if request.user == obj.user:
+            return UserMiniSerializer(obj.analyst).data if obj.analyst else None
+        else:
+            return UserMiniSerializer(obj.user).data
+
 
 
 class AnaMessageSerializer(serializers.ModelSerializer):
