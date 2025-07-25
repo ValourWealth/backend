@@ -98,7 +98,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 from rest_framework import serializers
-from .models import ChatThread, Message
+from .models import ChatThread, Message, Ana_Message
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -116,12 +116,14 @@ class ChatThreadSerializer(serializers.ModelSerializer):
         model = ChatThread
         fields = "__all__"
 
-class MessageSerializer(serializers.ModelSerializer):
+
+class AnaMessageSerializer(serializers.ModelSerializer):
     sender = UserMiniSerializer()
 
     class Meta:
         model = Ana_Message
         fields = "__all__"
+
 
 
 

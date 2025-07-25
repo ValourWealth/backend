@@ -1,11 +1,9 @@
-
 # import json
 # from channels.generic.websocket import AsyncWebsocketConsumer
 # from channels.db import database_sync_to_async
-# from .models import ChatThread, Ana_Message
 # from django.contrib.auth import get_user_model
 
-# User = get_user_model()
+
 
 # class ChatConsumer(AsyncWebsocketConsumer):
 #     async def connect(self):
@@ -37,7 +35,7 @@
 #             receiver = await self.get_user(int(self.other_user_id))
 
 #             thread = await self.get_or_create_thread(sender, receiver)
-#             msg = await self.create_message(thread, sender, message)
+#             await self.create_message(thread, sender, message)
 
 #             await self.channel_layer.group_send(
 #                 self.room_group_name,
@@ -58,10 +56,15 @@
 
 #     @database_sync_to_async
 #     def get_user(self, user_id):
+#         from django.contrib.auth import get_user_model
+#         User = get_user_model()
 #         return User.objects.get(id=user_id)
+
 
 #     @database_sync_to_async
 #     def get_or_create_thread(self, user1, user2):
+#         from .models import ChatThread  # ✅ moved inside method
+
 #         if user1.profile.role == 'analyst':
 #             return ChatThread.objects.get_or_create(user=user2, analyst=user1)[0]
 #         else:
@@ -69,13 +72,14 @@
 
 #     @database_sync_to_async
 #     def create_message(self, thread, sender, content):
+#         from .models import Ana_Message  # ✅ moved inside method
 #         return Ana_Message.objects.create(thread=thread, sender=sender, content=content)
 
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
-
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -87,7 +91,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         self.other_user_id = self.scope["url_route"]["kwargs"]["user_id"]
-        self.room_name = f"chat_{min(self.user.id, int(self.other_user_id))}_{max(self.user.id, int(self.other_user_id))}"
+
+        # Validate that user exists
+        try:
+            self.other_user = await self.get_user(int(self.other_user_id))
+        except ObjectDoesNotExist:
+            await self.close()
+            return
+
+        self.room_name = f"chat_{min(self.user.id, self.other_user.id)}_{max(self.user.id, self.other_user.id)}"
         self.room_group_name = f"chat_{self.room_name}"
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
@@ -104,18 +116,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if not message:
                 return
 
-            sender = self.user
-            receiver = await self.get_user(int(self.other_user_id))
-
-            thread = await self.get_or_create_thread(sender, receiver)
-            await self.create_message(thread, sender, message)
+            thread = await self.get_or_create_thread(self.user, self.other_user)
+            await self.create_message(thread, self.user, message)
 
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     "type": "chat_message",
                     "message": message,
-                    "sender": sender.username,
+                    "sender": self.user.username,
                 }
             )
         except Exception as e:
@@ -129,14 +138,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_user(self, user_id):
-        from django.contrib.auth import get_user_model
         User = get_user_model()
         return User.objects.get(id=user_id)
 
-
     @database_sync_to_async
     def get_or_create_thread(self, user1, user2):
-        from .models import ChatThread  # ✅ moved inside method
+        from .models import ChatThread
 
         if user1.profile.role == 'analyst':
             return ChatThread.objects.get_or_create(user=user2, analyst=user1)[0]
@@ -145,5 +152,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def create_message(self, thread, sender, content):
-        from .models import Ana_Message  # ✅ moved inside method
+        from .models import Ana_Message
         return Ana_Message.objects.create(thread=thread, sender=sender, content=content)

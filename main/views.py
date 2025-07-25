@@ -72,11 +72,22 @@ from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from .models import ChatThread, Message
-from .serializers import ChatThreadSerializer, MessageSerializer
+from .models import ChatThread, Ana_Message
+from .serializers import ChatThreadSerializer, AnaMessageSerializer  
+from django.contrib.auth import get_user_model
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+
+from .models import ChatThread, Ana_Message
+from .serializers import ChatThreadSerializer, AnaMessageSerializer  # ✅ FIXED name
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
 
 class InboxList(APIView):
     permission_classes = [IsAuthenticated]
@@ -88,15 +99,17 @@ class InboxList(APIView):
             threads = ChatThread.objects.filter(user=request.user)
         return Response(ChatThreadSerializer(threads, many=True).data)
 
+
 class MessageList(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]  # ✅ Add permission here
 
     def get(self, request, thread_id):
         thread = get_object_or_404(ChatThread, id=thread_id)
         if request.user != thread.user and request.user != thread.analyst:
             return Response({"detail": "Not allowed."}, status=403)
         messages = Ana_Message.objects.filter(thread=thread).order_by('timestamp')
-        return Response(MessageSerializer(messages, many=True).data)
+        return Response(AnaMessageSerializer(messages, many=True).data)  # ✅ FIXED name
+
 
 class VSendMessageView(APIView):
     permission_classes = [IsAuthenticated]
@@ -116,7 +129,8 @@ class VSendMessageView(APIView):
             sender=request.user,
             content=content
         )
-        return Response(MessageSerializer(message).data, status=201)
+        return Response(AnaMessageSerializer(message).data, status=201)  # ✅ FIXED name
+
 
 class GetOrCreateThread(APIView):
     permission_classes = [IsAuthenticated]
@@ -134,7 +148,6 @@ class GetOrCreateThread(APIView):
             thread, _ = ChatThread.objects.get_or_create(user=request.user, analyst=other_user)
 
         return Response(ChatThreadSerializer(thread).data)
-
 
 
 # ********************************************************************************************************************************************************************************

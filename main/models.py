@@ -178,24 +178,6 @@ class Trade(models.Model):
 
 
 
-
-# class ChatThread(models.Model):
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="threads", on_delete=models.CASCADE)
-#     analyst = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="analyst_threads", on_delete=models.CASCADE, null=True, blank=True)  # analyst assigned to thread
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"Chat with {self.user.username}"
-
-# class Message(models.Model):
-#     thread = models.ForeignKey(ChatThread, related_name="messages", on_delete=models.CASCADE)
-#     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-#     content = models.TextField()
-#     timestamp = models.DateTimeField(auto_now_add=True)
-#     is_read = models.BooleanField(default=False)
-
-#     def __str__(self):
-#         return f"From {self.sender.username} at {self.timestamp}"
 from django.db import models
 from django.conf import settings
 
