@@ -117,6 +117,8 @@ urlpatterns = [
     path("api/chat/thread/<int:thread_id>/send/", VSendMessageView.as_view(), name="chat-send-message"),
     path("api/chat/thread/create/", GetOrCreateThread.as_view(), name="chat-create-thread"),
     path("api/chat/analyst-auto-threads/", AllPlatinumThreadsForAnalyst.as_view(), name="analyst-auto-threads"),
+    path("api/chat/available-analysts/", AvailableAnalystsForPlatinum.as_view(), name="available-analysts"),
+
 
 
 

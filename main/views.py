@@ -7,12 +7,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, PermissionDenied
 
+
 from rest_framework.views import APIView
 from . models import *
 
 from rest_framework import status
 from .models import UserProfiles
-from .serializers import UserProfileSerializer
+from .serializers import UserProfileSerializer, UserMiniSerializer
 
 from .models import Conversation, Message, UserProfiles
 from django.contrib.auth import get_user_model
@@ -169,31 +170,6 @@ class GetOrCreateThread(APIView):
 
         return Response(ChatThreadSerializer(thread, context={"request": request}).data)
 
-# class GetOrCreateThread(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def post(self, request):
-#         other_user_id = request.data.get("user_id")
-#         if not other_user_id:
-#             return Response({"error": "user_id required"}, status=400)
-
-#         other_user = get_object_or_404(User, id=other_user_id)
-
-#         if request.user.profile.role == 'analyst' and other_user.profile.subscription_status != 'platinum':
-#             return Response({"error": "Only allowed with platinum users."}, status=403)
-
-#         if request.user.profile.subscription_status == 'platinum' and other_user.profile.role != 'analyst':
-#             return Response({"error": "Only allowed with analyst users."}, status=403)
-
-
-#         # ✅ Now outside both checks — this will run if both roles are valid
-#         if request.user.profile.role == 'analyst':
-#             thread, _ = ChatThread.objects.get_or_create(user=other_user, analyst=request.user)
-#         else:
-#             thread, _ = ChatThread.objects.get_or_create(user=request.user, analyst=other_user)
-
-#         return Response(ChatThreadSerializer(thread).data)
-
 class AllPlatinumThreadsForAnalyst(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -213,6 +189,22 @@ class AllPlatinumThreadsForAnalyst(APIView):
 
         # 3. Return serialized threads
         return Response(ChatThreadSerializer(threads, many=True, context={"request": request}).data)
+
+class AvailableAnalystsForPlatinum(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user_profile = request.user.profile
+        if user_profile.subscription_status != 'platinum':
+            return Response({"error": "Only platinum users can access this."}, status=403)
+
+        analysts = User.objects.filter(
+            profile__role='analyst',
+            profile__subscription_status='platinum'
+        ).exclude(id=request.user.id)
+
+        data = UserMiniSerializer(analysts, many=True).data
+        return Response(data)
 
 
 
