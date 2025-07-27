@@ -151,19 +151,48 @@ class GetOrCreateThread(APIView):
 
         other_user = get_object_or_404(User, id=other_user_id)
 
-        if request.user.profile.role == 'analyst' and other_user.profile.subscription_status != 'platinum':
-            return Response({"error": "Only allowed with platinum users."}, status=403)
+        # ✅ Role-based restriction logic
+        if request.user.profile.role == 'analyst':
+            if other_user.profile.subscription_status != 'platinum':
+                return Response({"error": "Analysts can only chat with platinum users."}, status=403)
+        elif request.user.profile.subscription_status == 'platinum':
+            if other_user.profile.role != 'analyst':
+                return Response({"error": "Platinum users can only chat with analysts."}, status=403)
+        else:
+            return Response({"error": "Only analysts and platinum users are allowed."}, status=403)
 
-        if request.user.profile.subscription_status == 'platinum' and other_user.profile.role != 'analyst':
-            return Response({"error": "Only allowed with analyst users."}, status=403)
-
-        # ✅ Now outside both checks — this will run if both roles are valid
+        # ✅ Proceed to get or create thread
         if request.user.profile.role == 'analyst':
             thread, _ = ChatThread.objects.get_or_create(user=other_user, analyst=request.user)
         else:
             thread, _ = ChatThread.objects.get_or_create(user=request.user, analyst=other_user)
 
-        return Response(ChatThreadSerializer(thread).data)
+        return Response(ChatThreadSerializer(thread, context={"request": request}).data)
+
+# class GetOrCreateThread(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+#         other_user_id = request.data.get("user_id")
+#         if not other_user_id:
+#             return Response({"error": "user_id required"}, status=400)
+
+#         other_user = get_object_or_404(User, id=other_user_id)
+
+#         if request.user.profile.role == 'analyst' and other_user.profile.subscription_status != 'platinum':
+#             return Response({"error": "Only allowed with platinum users."}, status=403)
+
+#         if request.user.profile.subscription_status == 'platinum' and other_user.profile.role != 'analyst':
+#             return Response({"error": "Only allowed with analyst users."}, status=403)
+
+
+#         # ✅ Now outside both checks — this will run if both roles are valid
+#         if request.user.profile.role == 'analyst':
+#             thread, _ = ChatThread.objects.get_or_create(user=other_user, analyst=request.user)
+#         else:
+#             thread, _ = ChatThread.objects.get_or_create(user=request.user, analyst=other_user)
+
+#         return Response(ChatThreadSerializer(thread).data)
 
 class AllPlatinumThreadsForAnalyst(APIView):
     permission_classes = [IsAuthenticated]
