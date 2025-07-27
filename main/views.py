@@ -165,6 +165,26 @@ class GetOrCreateThread(APIView):
 
         return Response(ChatThreadSerializer(thread).data)
 
+class AllPlatinumThreadsForAnalyst(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.profile.role != 'analyst':
+            return Response({"error": "Only analysts can access this."}, status=403)
+
+        # 1. Get all platinum users (excluding the analyst himself)
+        platinum_users = User.objects.filter(profile__subscription_status='platinum').exclude(id=request.user.id)
+
+        threads = []
+
+        for user in platinum_users:
+            # 2. Get or create thread for each user
+            thread, _ = ChatThread.objects.get_or_create(user=user, analyst=request.user)
+            threads.append(thread)
+
+        # 3. Return serialized threads
+        return Response(ChatThreadSerializer(threads, many=True, context={"request": request}).data)
+
 
 
 # ********************************************************************************************************************************************************************************
