@@ -206,21 +206,24 @@ User = get_user_model()
 #         data = UserMiniSerializer(analysts, many=True).data
 #         return Response(data)
 
+
 class InboxList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user_profile = request.user.profile
+        try:
+            profile = request.user.profile
+        except:
+            return Response({"detail": "No user profile found"}, status=400)
 
-        if user_profile.role == 'analyst':
+        if profile.role == 'analyst':
             threads = ChatThread.objects.filter(analyst=request.user)
-        elif user_profile.subscription_status == 'platinum':
+        elif profile.subscription_status == 'platinum':
             threads = ChatThread.objects.filter(user=request.user)
         else:
             return Response([], status=403)
 
-        serializer = ChatThreadSerializer(threads, many=True)
-        return Response(serializer.data)
+        return Response(ChatThreadSerializer(threads, many=True, context={"request": request}).data)
 
 
 class MessageList(APIView):
