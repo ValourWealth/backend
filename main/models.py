@@ -190,14 +190,13 @@ class ChatThread(models.Model):
         return f"{self.user.username} - {self.analyst.username if self.analyst else 'Unassigned'}"
 
 class Ana_Message(models.Model):
-    thread = models.ForeignKey(ChatThread, related_name="messages", on_delete=models.CASCADE)
+    thread = models.ForeignKey(ChatThread, on_delete=models.CASCADE, related_name="messages")
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    content = models.TextField()
+    message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.sender.username}: {self.content[:20]}"
+        return f"From {self.sender.username} at {self.timestamp}"
 
 
 

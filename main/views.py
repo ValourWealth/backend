@@ -90,6 +90,122 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+# class InboxList(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request):
+#         user_profile = request.user.profile
+
+#         if user_profile.role == 'analyst':
+#             # Analyst sees only threads with platinum users assigned to them
+#             threads = ChatThread.objects.filter(
+#                 user__profile__subscription_status='platinum',
+#                 analyst=request.user
+#             )
+#         elif user_profile.subscription_status == 'platinum':
+#             # Platinum user sees only their own thread
+#             threads = ChatThread.objects.filter(user=request.user)
+#         else:
+#             return Response([], status=403)
+
+#         return Response(ChatThreadSerializer(threads, many=True, context={"request": request}).data)
+
+
+# class MessageList(APIView):
+#     permission_classes = [IsAuthenticated]  # ✅ Add permission here
+
+#     def get(self, request, thread_id):
+#         thread = get_object_or_404(ChatThread, id=thread_id)
+#         if request.user != thread.user and request.user != thread.analyst:
+#             return Response({"detail": "Not allowed."}, status=403)
+#         messages = Ana_Message.objects.filter(thread=thread).order_by('timestamp')
+#         return Response(AnaMessageSerializer(messages, many=True).data)  # ✅ FIXED name
+
+
+# class VSendMessageView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request, thread_id):
+#         thread = get_object_or_404(ChatThread, id=thread_id)
+#         content = request.data.get("content")
+
+#         if not content:
+#             return Response({"error": "Message content required."}, status=400)
+
+#         if request.user != thread.user and request.user != thread.analyst:
+#             return Response({"error": "Not authorized."}, status=403)
+
+#         message = Ana_Message.objects.create(
+#             thread=thread,
+#             sender=request.user,
+#             content=content
+#         )
+#         return Response(AnaMessageSerializer(message).data, status=201)  # ✅ FIXED name
+
+# class GetOrCreateThread(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+#         other_user_id = request.data.get("user_id")
+#         if not other_user_id:
+#             return Response({"error": "user_id required"}, status=400)
+
+#         other_user = get_object_or_404(User, id=other_user_id)
+
+#         # ✅ Role-based restriction logic
+#         if request.user.profile.role == 'analyst':
+#             if other_user.profile.subscription_status != 'platinum':
+#                 return Response({"error": "Analysts can only chat with platinum users."}, status=403)
+#         elif request.user.profile.subscription_status == 'platinum':
+#             if other_user.profile.role != 'analyst':
+#                 return Response({"error": "Platinum users can only chat with analysts."}, status=403)
+#         else:
+#             return Response({"error": "Only analysts and platinum users are allowed."}, status=403)
+
+#         # ✅ Proceed to get or create thread
+#         if request.user.profile.role == 'analyst':
+#             thread, _ = ChatThread.objects.get_or_create(user=other_user, analyst=request.user)
+#         else:
+#             thread, _ = ChatThread.objects.get_or_create(user=request.user, analyst=other_user)
+
+#         return Response(ChatThreadSerializer(thread, context={"request": request}).data)
+
+# class AllPlatinumThreadsForAnalyst(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request):
+#         if request.user.profile.role != 'analyst':
+#             return Response({"error": "Only analysts can access this."}, status=403)
+
+#         # 1. Get all platinum users (excluding the analyst himself)
+#         platinum_users = User.objects.filter(profile__subscription_status='platinum').exclude(id=request.user.id)
+
+#         threads = []
+
+#         for user in platinum_users:
+#             # 2. Get or create thread for each user
+#             thread, _ = ChatThread.objects.get_or_create(user=user, analyst=request.user)
+#             threads.append(thread)
+
+#         # 3. Return serialized threads
+#         return Response(ChatThreadSerializer(threads, many=True, context={"request": request}).data)
+
+# class AvailableAnalystsForPlatinum(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request):
+#         user_profile = request.user.profile
+#         if user_profile.subscription_status != 'platinum':
+#             return Response({"error": "Only platinum users can access this."}, status=403)
+
+#         analysts = User.objects.filter(
+#             profile__role='analyst',
+#             profile__subscription_status='platinum'
+#         ).exclude(id=request.user.id)
+
+#         data = UserMiniSerializer(analysts, many=True).data
+#         return Response(data)
+
 class InboxList(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -97,114 +213,73 @@ class InboxList(APIView):
         user_profile = request.user.profile
 
         if user_profile.role == 'analyst':
-            # Analyst sees only threads with platinum users assigned to them
-            threads = ChatThread.objects.filter(
-                user__profile__subscription_status='platinum',
-                analyst=request.user
-            )
+            threads = ChatThread.objects.filter(analyst=request.user)
         elif user_profile.subscription_status == 'platinum':
-            # Platinum user sees only their own thread
             threads = ChatThread.objects.filter(user=request.user)
         else:
             return Response([], status=403)
 
-        return Response(ChatThreadSerializer(threads, many=True, context={"request": request}).data)
+        serializer = ChatThreadSerializer(threads, many=True)
+        return Response(serializer.data)
 
 
 class MessageList(APIView):
-    permission_classes = [IsAuthenticated]  # ✅ Add permission here
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, thread_id):
         thread = get_object_or_404(ChatThread, id=thread_id)
-        if request.user != thread.user and request.user != thread.analyst:
-            return Response({"detail": "Not allowed."}, status=403)
-        messages = Ana_Message.objects.filter(thread=thread).order_by('timestamp')
-        return Response(AnaMessageSerializer(messages, many=True).data)  # ✅ FIXED name
+        if request.user not in [thread.user, thread.analyst]:
+            return Response({"detail": "Unauthorized"}, status=403)
 
+        messages = thread.messages.all().order_by('timestamp')
+        serializer = AnaMessageSerializer(messages, many=True)
+        return Response(serializer.data)
 
-class VSendMessageView(APIView):
+class CreateChatThread(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user_id = request.data.get("user_id")
+        other_user = get_object_or_404(User, id=user_id)
+
+        if request.user.profile.role == 'analyst':
+            thread, created = ChatThread.objects.get_or_create(user=other_user, analyst=request.user)
+        elif request.user.profile.subscription_status == 'platinum':
+            thread, created = ChatThread.objects.get_or_create(user=request.user, analyst=other_user)
+        else:
+            return Response({"detail": "Unauthorized"}, status=403)
+
+        return Response({"id": thread.id})
+
+class analystchat_SendMessage(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, thread_id):
         thread = get_object_or_404(ChatThread, id=thread_id)
-        content = request.data.get("content")
+        if request.user not in [thread.user, thread.analyst]:
+            return Response({"detail": "Unauthorized"}, status=403)
 
-        if not content:
-            return Response({"error": "Message content required."}, status=400)
-
-        if request.user != thread.user and request.user != thread.analyst:
-            return Response({"error": "Not authorized."}, status=403)
-
-        message = Ana_Message.objects.create(
+        message = request.data.get("message")
+        msg_obj = Ana_Message.objects.create(
             thread=thread,
             sender=request.user,
-            content=content
+            message=message
         )
-        return Response(AnaMessageSerializer(message).data, status=201)  # ✅ FIXED name
 
-class GetOrCreateThread(APIView):
-    permission_classes = [IsAuthenticated]
+        serializer = AnaMessageSerializer(msg_obj)
+        return Response(serializer.data)
 
-    def post(self, request):
-        other_user_id = request.data.get("user_id")
-        if not other_user_id:
-            return Response({"error": "user_id required"}, status=400)
+def initialize_all_threads():
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    analysts = User.objects.filter(profile__role='analyst')
+    platinums = User.objects.filter(profile__subscription_status='platinum')
 
-        other_user = get_object_or_404(User, id=other_user_id)
+    for analyst in analysts:
+        for user in platinums:
+            ChatThread.objects.get_or_create(user=user, analyst=analyst)
 
-        # ✅ Role-based restriction logic
-        if request.user.profile.role == 'analyst':
-            if other_user.profile.subscription_status != 'platinum':
-                return Response({"error": "Analysts can only chat with platinum users."}, status=403)
-        elif request.user.profile.subscription_status == 'platinum':
-            if other_user.profile.role != 'analyst':
-                return Response({"error": "Platinum users can only chat with analysts."}, status=403)
-        else:
-            return Response({"error": "Only analysts and platinum users are allowed."}, status=403)
 
-        # ✅ Proceed to get or create thread
-        if request.user.profile.role == 'analyst':
-            thread, _ = ChatThread.objects.get_or_create(user=other_user, analyst=request.user)
-        else:
-            thread, _ = ChatThread.objects.get_or_create(user=request.user, analyst=other_user)
-
-        return Response(ChatThreadSerializer(thread, context={"request": request}).data)
-
-class AllPlatinumThreadsForAnalyst(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        if request.user.profile.role != 'analyst':
-            return Response({"error": "Only analysts can access this."}, status=403)
-
-        # 1. Get all platinum users (excluding the analyst himself)
-        platinum_users = User.objects.filter(profile__subscription_status='platinum').exclude(id=request.user.id)
-
-        threads = []
-
-        for user in platinum_users:
-            # 2. Get or create thread for each user
-            thread, _ = ChatThread.objects.get_or_create(user=user, analyst=request.user)
-            threads.append(thread)
-
-        # 3. Return serialized threads
-        return Response(ChatThreadSerializer(threads, many=True, context={"request": request}).data)
-
-class AvailableAnalystsForPlatinum(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user_profile = request.user.profile
-        if user_profile.subscription_status != 'platinum':
-            return Response({"error": "Only platinum users can access this."}, status=403)
-
-        analysts = User.objects.filter(
-            profile__role='analyst',
-            profile__subscription_status='platinum'
-        ).exclude(id=request.user.id)
-
-        data = UserMiniSerializer(analysts, many=True).data
-        return Response(data)
 
 
 

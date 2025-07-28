@@ -116,32 +116,40 @@ class UserMiniSerializer(serializers.ModelSerializer):
         return None
     
 
+# class ChatThreadSerializer(serializers.ModelSerializer):
+#     user = UserMiniSerializer()
+#     analyst = UserMiniSerializer()
+#     other_party = serializers.SerializerMethodField()
+
+#     class Meta:
+#         model = ChatThread
+#         fields = ["id", "user", "analyst", "created_at", "other_party"]
+
+#     def get_other_party(self, obj):
+#         request = self.context.get("request")
+#         if request is None or not hasattr(request, "user"):
+#             return None
+
+#         if obj.analyst == request.user:
+#             return UserMiniSerializer(obj.user).data
+#         else:
+            # return UserMiniSerializer(obj.analyst).data if obj.analyst else None
+
 class ChatThreadSerializer(serializers.ModelSerializer):
-    user = UserMiniSerializer()
-    analyst = UserMiniSerializer()
-    other_party = serializers.SerializerMethodField()
+    user = UserProfileSerializer()
+    analyst = UserProfileSerializer()
 
     class Meta:
         model = ChatThread
-        fields = ["id", "user", "analyst", "created_at", "other_party"]
-
-    def get_other_party(self, obj):
-        request = self.context.get("request")
-        if request is None or not hasattr(request, "user"):
-            return None
-
-        if obj.analyst == request.user:
-            return UserMiniSerializer(obj.user).data
-        else:
-            return UserMiniSerializer(obj.analyst).data if obj.analyst else None
+        fields = ['id', 'user', 'analyst', 'created_at']
 
 
 class AnaMessageSerializer(serializers.ModelSerializer):
-    sender = UserMiniSerializer()
+    sender = UserProfileSerializer()
 
     class Meta:
         model = Ana_Message
-        fields = "__all__"
+        fields = ['id', 'thread', 'sender', 'message', 'timestamp']
 
 
 

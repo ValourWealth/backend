@@ -112,13 +112,16 @@ urlpatterns = [
     path('api/analyst-messages/', AnalystMessageListView.as_view(), name='analyst-messages'),
 
 
-    path("api/chat/inbox/", InboxList.as_view(), name="chat-inbox"),
-    path("api/chat/thread/<int:thread_id>/", MessageList.as_view(), name="chat-thread-messages"),
-    path("api/chat/thread/<int:thread_id>/send/", VSendMessageView.as_view(), name="chat-send-message"),
-    path("api/chat/thread/create/", GetOrCreateThread.as_view(), name="chat-create-thread"),
-    path("api/chat/analyst-auto-threads/", AllPlatinumThreadsForAnalyst.as_view(), name="analyst-auto-threads"),
-    path("api/chat/available-analysts/", AvailableAnalystsForPlatinum.as_view(), name="available-analysts"),
-
+    # path("api/chat/inbox/", InboxList.as_view(), name="chat-inbox"),
+    # path("api/chat/thread/<int:thread_id>/", MessageList.as_view(), name="chat-thread-messages"),
+    # path("api/chat/thread/<int:thread_id>/send/", VSendMessageView.as_view(), name="chat-send-message"),
+    # path("api/chat/thread/create/", GetOrCreateThread.as_view(), name="chat-create-thread"),
+    # path("api/chat/analyst-auto-threads/", AllPlatinumThreadsForAnalyst.as_view(), name="analyst-auto-threads"),
+    # path("api/chat/available-analysts/", AvailableAnalystsForPlatinum.as_view(), name="available-analysts"),
+    path('api/chat/inbox/', InboxList.as_view()),
+    path('api/chat/thread/<int:thread_id>/', MessageList.as_view()),
+    path('api/chat/thread/create/', CreateChatThread.as_view()),
+    path('api/chat/thread/<int:thread_id>/send/', analystchat_SendMessage.as_view()),
 
 
 
